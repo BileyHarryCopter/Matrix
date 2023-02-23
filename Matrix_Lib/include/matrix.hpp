@@ -119,8 +119,9 @@ public:
         
         return *this;
     }
-
-    ~Matrix() 
+    
+    //  Is it necessary create virtual destructor?
+    ~Matrix()
     {
         for (auto i = 0; i < m_; ++i)
             delete [] rows_[i];
@@ -138,7 +139,7 @@ public:
     T trace() const 
     {
         T trace_ = 0;
-        for (auto i = 0; i < n_; ++i)
+        for (auto i = 0; (i < n_) && (i < m_); ++i)
             trace_ += rows_[i][i];
         return trace_;
     }
@@ -246,67 +247,18 @@ public:
     }
 
     static Matrix eye(size_t n);
-    T determinant () 
+
+    T determinant() requires std::is_integral<T>::value
     {
         if (n_ != m_)
-            throw std::logic_error ("Matrix should be square for computing determinant");
-        return determinant_in(); 
-    }
+            throw std::logic_error("There is no functions to calculate a determinant");
 
-private:
-    //  Without pivoting and parenthesis for square matrix
-    T determinant_in () const
-    {
         Matrix<T> tmp = *this;
         auto sign = 1;
         T det;
 
-        if (std::is_integral<T>::value == false)
+        for(int i = 0; i < n_ - 1; ++i) 
         {
-            //  Begining of Gaussian Elimination
-
-            for (auto i = 0; i < n_ - 1; ++i)
-            {
-                //  finding out a pivot element
-                if (cmp::are_equal(tmp.rows_[i][i], 0.0, cmp::epsilon)) 
-                {
-                    auto pivot_i = i;
-
-                    for (auto j = i + 1; j < m_; ++j)
-                    {
-                        if (!cmp::are_equal (tmp.rows_[j][i], 0.0, cmp::epsilon))
-                        {
-                            pivot_i = j;
-                            break;
-                        }
-                    }
-                    if (cmp::are_equal(tmp.rows_[pivot_i][i], 0.0, cmp::epsilon))
-                        return 0.0;
-
-                    std::swap (tmp.rows_[i], tmp.rows_[pivot_i]);
-
-                    sign *= (-1);
-                }
-
-
-                for (auto j = i + 1; j < n_; ++j)
-                {
-                    T koef = tmp.rows_[j][i] / tmp.rows_[i][i];
-                    std::transform (tmp.rows_[j] + i, tmp.rows_[j] + n_, tmp.rows_[i] + i, tmp.rows_[j] + i,
-                                    [koef] (T first, T second) { return first -= koef * second; });
-                }
-            }
-
-            det = tmp.rows_[0][0];
-            for (auto i = 1; i < n_; ++i)
-                det *= tmp.rows_[i][i];
-        }
-        else 
-        {
-            //  Begining of Bareiss Algorithm
-
-            for(int i = 0; i < n_ - 1; ++i) 
-            {
                 //Pivot - row swap needed
                 if(tmp.rows_[i][i] == 0) 
                 {
@@ -329,7 +281,7 @@ private:
                     sign *= (-1);
                 }
 
-                for (int j = i + 1; j < n_; ++j) 
+                for (int j = i + 1; j < m_; ++j) 
                 {
                     for (int k = i + 1; k < n_; ++k) 
                     {                    
@@ -338,17 +290,62 @@ private:
                             tmp.rows_[j][k] /= tmp.rows_[i-1][i-1];
                     }
                 }
-            }
-
-            det = tmp.rows_[n_ - 1][n_ - 1];
         }
 
-        det *= sign;
-        return det;
+        det = tmp.rows_[n_ - 1][n_ - 1];
+    
+        return det * sign;
+    }
+
+    T determinant() requires std::is_floating_point<T>::value
+    {
+        if (n_ != m_)
+            throw std::logic_error("There is no functions to calculate a determinant");
+
+        Matrix <T> tmp = *this;
+        auto sign = 1;
+        T det;
+
+        for (auto i = 0; i < n_ - 1; ++i)
+        {
+            //  finding out a pivot element
+            if (cmp::are_equal(tmp.rows_[i][i], 0.0, cmp::epsilon)) 
+            {
+                auto pivot_i = i;
+
+                for (auto j = i + 1; j < m_; ++j)
+                {
+                    if (!cmp::are_equal (tmp.rows_[j][i], 0.0, cmp::epsilon))
+                    {
+                        pivot_i = j;
+                        break;
+                    }
+                }
+                if (cmp::are_equal(tmp.rows_[pivot_i][i], 0.0, cmp::epsilon))
+                    return 0.0;
+
+                std::swap (tmp.rows_[i], tmp.rows_[pivot_i]);
+
+                sign *= (-1);
+            }
+
+
+            for (auto j = i + 1; j < m_; ++j)
+            {
+                T koef = tmp.rows_[j][i] / tmp.rows_[i][i];
+                std::transform (tmp.rows_[j] + i, tmp.rows_[j] + n_, tmp.rows_[i] + i, tmp.rows_[j] + i,
+                                [koef] (T first, T second) { return first -= koef * second; });
+            }
+        }
+
+        det = tmp.rows_[0][0];
+        for (auto i = 1; i < n_; ++i)
+            det *= tmp.rows_[i][i];
+
+        return det * sign;
     }
 
 };  //  class Matrix
-
 
 template <typename T>
 Matrix<T> operator+ (const Matrix<T>& lhs, const Matrix<T> &rhs)
