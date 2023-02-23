@@ -8,7 +8,7 @@ TEST (OPERATOR_TESTS, EQUALITY)
 {
     Matrix<double> A = {{1, 0}, {2, 3}, {3, 3}};
     std::vector<double> v = {1, 0, 2, 3, 3, 3};
-    Matrix<double> B {2, 3, v.begin(), v.end()};
+    Matrix<double> B = {2, 3, v.begin(), v.end()};
 
     EXPECT_TRUE (A == B);
 }
@@ -17,7 +17,7 @@ TEST (OPERATOR__TESTS, NON_EQUALITY)
 {
     Matrix<double> A = {{1, 1}, {2, 3}, {3, 3}};
     std::vector<double> v = {1, 0, 2, 3, 3, 3};
-    Matrix<double> B {2, 3, v.begin(), v.end()};
+    Matrix<double> B = {2, 3, v.begin(), v.end()};
 
     EXPECT_TRUE (A != B);
 }

@@ -21,3 +21,16 @@ target_link_directories(operator_tests
 )
 
 add_test(operator_gtests operator_tests)
+
+add_executable(determinant_tests determinant_tests.cpp)
+
+target_link_libraries(determinant_tests
+    PRIVATE
+    GTest::GTest
+)
+
+target_link_directories(determinant_tests
+                        PRIVATE ../Matrix_Lib/include
+)
+
+add_test(determinant_gtests determinant_tests)
