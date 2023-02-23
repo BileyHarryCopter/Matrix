@@ -9,7 +9,11 @@ constexpr double epsilon = 1e-6;
 inline bool are_equal(const double a, const double b, const double accurancy = epsilon)
 {
     auto diff = std::abs(a - b);
-    
+    auto max = std::min(std::abs(a), std::abs(b));
+
+    if (max != 0.0) //  not a pure zero
+        diff = diff / max;
+
     return diff < accurancy;
 }
 
