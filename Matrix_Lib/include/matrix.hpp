@@ -8,150 +8,85 @@
 #include <functional>
 
 #include "comparison.hpp"
+#include "array.hpp"
 
 namespace Matrix_Algebra
 {
+
+using namespace My_Array;
 
 template<typename T = double> class Matrix
 {
 
     size_t n_ = 0, m_ = 0;
-    T** rows_ = nullptr;
+    Array<T> container_;
 
-    struct ProxyRow
+    struct Proxy_Row 
     {
-        T *row = nullptr;
-        T& operator[](int n) { return row[n]; }
-        const T &operator[](int n) const { return row[n]; }
+        T *row_ = nullptr;
+        T& operator[](size_t n) { return row_[n]; }
+        const T& operator[](size_t n) const { return row_[n]; }
     };
 
-public:
+    public :
 
-    Matrix(size_t n, size_t m, T value = T{}) : n_{n}, m_{m}, rows_{new T* [m]}
-    {
-        for (auto i = 0; i < m_; ++i)
-        {
-            rows_[i] = new T [n_];
-            std::fill (rows_[i], rows_[i] + n_, value);
-        }
-    }
+    Matrix (size_t n, size_t m, T value = T{}) : n_{n}, m_{m}, container_{m_ * n_}  { container_.fill(value); }
 
     //  Constructor of matrix (n x m) from sequence
-    //  explanation: end has same sence as end of std::vector
     template<std::input_iterator It> 
-    Matrix (size_t n, size_t m, const It start, const It end) : n_{n}, m_{m}, rows_{new T* [m]}
-    {
-        for (auto i = 0; i < m_; ++i)
-        {
-            rows_[i] = new T[n_];
-            std::copy (start + i * n_, start + (i + 1) * n_, rows_[i]);
-        }
-    }
-
-    //  Constructor of vector (1 x n) from sequence
-    //  explanation: end has same sence as end of std::vector
-    template<std::input_iterator It>
-    Matrix (size_t n, const It start, const It end) : n_{n}, m_{1}, rows_{new T* [m_]}
-    {
-        *rows_ = new T[n_];
-        std::copy (start, end, *rows_);
-    }
+    Matrix (size_t n, size_t m, const It start, const It end) : n_{n}, m_{m}, container_{Array<T>(n_ * m_, start, end)} {}
 
     //  Constructor from nested initializer list
-    Matrix (std::initializer_list<std::initializer_list<T>> input_list) : m_{input_list.size()}, 
-                                                                          rows_{new T* [input_list.size()]}
+    Matrix (const std::initializer_list<std::initializer_list<T>>& input_list) : m_{input_list.size()}
     {
-        //  finding out max length of string
+        n_ = std::max (input_list,  [](std::initializer_list<T> first, std::initializer_list<T> second) 
+                                    {return (first.size() <= second.size()) ? second.size() : first.size();}).size();
         auto input_list_ptr = input_list.begin();
-        n_ = input_list_ptr[0].size();
-        for (int i = 0; i < m_; ++i)
-        {
-            if (n_ < input_list_ptr[i].size())
-                n_ = input_list_ptr[i].size();
-        }
 
-        for (int i = 0; i < m_; ++i)
+        container_ = Array<T>{m_ * n_};
+
+        for (auto i = 0, pivot_i = 0; i < m_; ++i)
         {
-            rows_[i] = new T[n_];
-            
-            auto input_list_i_ptr = input_list_ptr[i].begin();
+            for (auto x : input_list_ptr[i])
+                container_.push_back(x);
+
             auto input_list_i_len = input_list_ptr[i].size();
-            std::copy (input_list_i_ptr, input_list_i_ptr + input_list_i_len, rows_[i]);
-
             if (input_list_i_len < n_)
-                std::fill(rows_[i] + input_list_i_len, rows_[i] + n_, T(0));
+                container_.fill(pivot_i + input_list_i_len, pivot_i + n_, T(0));
+
+            pivot_i += n_;
         }
     }
 
     //  Constructor from single initializer list
-    Matrix (std::initializer_list<T> input_list) : m_{1}, n_{input_list.size()}, rows_{new T* [1]}
+    Matrix (std::initializer_list<T> input_list) : m_{1}, n_{input_list.size()}, container_{n_}
     {
-        *rows_ = new T[n_];
-        std::copy (input_list.begin(), input_list.end(), *rows_);
+        for (auto x : input_list)
+            container_.push_back(x);
     }
 
-    Matrix(const Matrix &rhs) : n_{rhs.n_}, m_{rhs.m_}, rows_{new T *[rhs.m_]}
-    {
-        for (auto i = 0; i < m_; ++i)
-        {
-            rows_[i] = new T [n_];
-            std::copy (rhs.rows_[i], rhs.rows_[i] + n_, rows_[i]);
-        }
-    }
-
-    Matrix(Matrix &&rhs) noexcept : n_{std::exchange(rhs.n_, 0)},
-                                    m_{std::exchange(rhs.m_, 0)},
-                                    rows_{std::exchange(rhs.rows_, nullptr)} {}
-
-    Matrix& operator= (const Matrix& rhs)
-    {
-        auto matrix{rhs};
-        std::swap(*this, matrix);
-
-        return *this;
-    }
-
-    Matrix& operator=(Matrix &&rhs) noexcept
-    {
-        std::swap(n_, rhs.n_);
-        std::swap(m_, rhs.m_);
-        std::swap(rows_, rhs.rows_);
-        
-        return *this;
-    }
-    
-    //  Is it necessary create virtual destructor?
-    ~Matrix()
-    {
-        for (auto i = 0; i < m_; ++i)
-            delete [] rows_[i];
-        delete [] rows_;
-    }
-
-//  Access methods and selectors
-
-    ProxyRow operator[](int m) { return ProxyRow {rows_[m]}; }
-    const ProxyRow operator[](int m) const { return ProxyRow {rows_[m]}; }
+    Proxy_Row operator[](int m)             { return Proxy_Row {begin_data() + m * n_}; }
+    const Proxy_Row operator[](int m) const { return Proxy_Row {begin_data() + m * n_}; }
 
     size_t get_rows() const { return m_; }
     size_t get_cols() const { return n_; }
+    T*  begin_data () const { return container_.begin(); }
 
-    T trace() const 
+    T& trace() const 
     {
         T trace_ = 0;
         for (auto i = 0; (i < n_) && (i < m_); ++i)
-            trace_ += rows_[i][i];
+            trace_ += *this[i][i];
         return trace_;
     }
 
     void dump(std::ostream& os = std::cout) const
     {
-        std::cout << '\n';
         for (auto i = 0; i < m_; ++i)
         {
             os << '\t';
             for (auto j = 0; j < n_; ++j)
-                os << "|" << std::setw(5) << std::left << rows_[i][j];
+                os << "|" << std::setw(5) << std::left << container_[i * n_ + j];
             os << "|\n";
         }
     }
@@ -164,24 +99,14 @@ public:
         if (m_ != rhs.m_ || n_ != rhs.n_)
             return false;
 
-        if (std::is_integral<T>::value == true)
-        {
-            for (auto i = 0; i < m_; ++i)
-            {
-                if (!std::equal(rows_[i], rows_[i] + n_, rhs.rows_[i]))
-                    return false;
-            }
-        }
-        else
-        {
-            for (auto i = 0; i < m_; ++i)
-            {
-                if (!std::equal(rows_[i], rows_[i] + n_, rhs.rows_[i],
-                                [](T first, T second)
-                                { return cmp::are_equal(first, second, cmp::epsilon); }))
-                    return false;
-            }
-        }
+        if ((std::is_integral<T>::value == true) &&
+            (!std::equal(container_.begin(), container_.begin() + m_ * n_, rhs.container_.begin())))
+                return false;
+        else if ((std::is_integral<T>::value == false) &&
+                 (!std::equal(container_.begin(), container_.begin() + m_ * n_, rhs.container_.begin(),
+                            [](T first, T second)
+                            { return cmp::are_equal(first, second, cmp::epsilon); })))
+                return false;
 
         return true;
     }
@@ -190,15 +115,15 @@ public:
     Matrix operator- ()
     {
         Matrix tmp = *this;
-        for (auto i = 0; i < m_; ++i)
-            std::transform (rows_[i], rows_[i] + n_, tmp.rows_[i], std::negate());
+        std::transform (container_.begin(), container_.begin() + m_ * n_, 
+                        tmp.container_.begin(), std::negate());
 
         return tmp;
     }
     Matrix& inverse_sign ()
     {
-        for (auto i = 0; i < m_; ++i)
-            std::transform (rows_[i], rows_[i] + n_, rows_[i], std::negate());
+        std::transform (container_.begin(), container_.begin() + m_ * n_, 
+                        container_.begin(), std::negate());
 
         return *this;
     }
@@ -208,8 +133,8 @@ public:
         if (m_ != rhs.m_ || n_ != rhs.n_)
             throw std::logic_error("Inappropriate size for matrix addition");
 
-        for (auto i = 0; i < m_; ++i)
-            std::transform (rows_[i], rows_[i] + n_, rhs.rows_[i], rows_[i], std::plus());
+        std::transform (container_.begin(), container_.begin() + m_ * n_, 
+                        rhs.container_.begin(), container_.begin(), std::plus());
 
         return *this;
     }
@@ -219,17 +144,16 @@ public:
         if (m_ != rhs.m_ || n_ != rhs.n_)
             throw std::logic_error("Inappropriate size for matrix subtraction");
 
-        for (auto i = 0; i < m_; ++i)
-            std::transform (rows_[i], rows_[i] + n_, rhs.rows_[i], rows_[i], std::minus());
+        std::transform (container_.begin(),     container_.begin() + m_ * n_, 
+                        rhs.container_.begin(), container_.begin(), std::minus());
 
         return *this;
     }
 
     Matrix & operator*=(T value)
     {
-        for (auto i = 0; i < m_; ++i)
-            std::transform(
-                rows_[i], rows_[i] + n_, rows_[i], [value](T arg) { return arg *= value; });
+        std::transform (container_.begin(), container_.begin() + m_ * n_, 
+                        container_.begin(), [value](T arg) { return arg *= value; });
 
         return *this;
     }
@@ -238,10 +162,10 @@ public:
     {
         if ((std::is_integral<T>::value == true) && (value == 0) ||
             cmp::are_equal (value, 0.0, cmp::epsilon) == true)
-                throw std::logic_error("Devision on zero is undefined behaviour");
+                throw std::logic_error("Devision on zero is not allowed");
 
-        for (auto i = 0; i < m_; ++i)
-            std::transform (rows_[i], rows_[i] + n_, rows_[i], [value](T arg) { return arg /= value; });
+        std::transform (container_.begin(), container_.begin() + m_ * n_, 
+                        container_.begin(), [value](T arg) { return arg /= value; });
 
         return *this;
     }
@@ -255,44 +179,42 @@ public:
 
         Matrix<T> tmp = *this;
         auto sign = 1;
-        T det;
 
         for(int i = 0; i < n_ - 1; ++i) 
         {
-                //Pivot - row swap needed
-                if(tmp.rows_[i][i] == 0) 
-                {
-                    auto pivot_i = i;
+            //Pivot - row swap needed
+            if(tmp[i][i] == 0) 
+            {
+                auto pivot_i = i;
 
-                    for (auto j = i + 1; j < n_; ++j)
+                for (auto j = i + 1; j < n_; ++j)
+                {
+                    if (tmp[j][i] > tmp[pivot_i][i])
                     {
-                        if (tmp.rows_[j][i] > tmp.rows_[pivot_i][i])
-                        {
-                            pivot_i = j;
-                            break;
-                        }
-                    }
-
-                    if (tmp.rows_[pivot_i][i] == T(0))
-                        return T(0);
-
-                    std::swap (tmp.rows_[i], tmp.rows_[pivot_i]);
-
-                    sign *= (-1);
-                }
-
-                for (int j = i + 1; j < m_; ++j) 
-                {
-                    for (int k = i + 1; k < n_; ++k) 
-                    {                    
-                        tmp.rows_[j][k] = tmp.rows_[i][i] * tmp.rows_[j][k] - tmp.rows_[j][i] * tmp.rows_[i][k];
-                        if (i != 0)
-                            tmp.rows_[j][k] /= tmp.rows_[i-1][i-1];
+                        pivot_i = j;
+                        break;
                     }
                 }
+                if (tmp[pivot_i][i] == T(0))
+                    return T(0);
+
+                tmp.container_.swap_subarray (i * n_, (i + 1) * n_, pivot_i * n_);
+
+                sign *= (-1);
+            }
+
+            for (int j = i + 1; j < m_; ++j) 
+            {
+                for (int k = i + 1; k < n_; ++k) 
+                {                    
+                    tmp[j][k] = tmp[i][i] * tmp[j][k] - tmp[j][i] * tmp[i][k];
+                    if (i != 0)
+                        tmp[j][k] /= tmp[i-1][i-1];
+                }
+            }
         }
 
-        det = tmp.rows_[n_ - 1][n_ - 1];
+        T det = tmp[n_ - 1][n_ - 1];
     
         return det * sign;
     }
@@ -304,43 +226,42 @@ public:
 
         Matrix <T> tmp = *this;
         auto sign = 1;
-        T det;
 
         for (auto i = 0; i < n_ - 1; ++i)
         {
             //  finding out a pivot element
-            if (cmp::are_equal(tmp.rows_[i][i], 0.0, cmp::epsilon)) 
+            if (cmp::are_equal(tmp[i][i], 0.0, cmp::epsilon))
             {
                 auto pivot_i = i;
 
                 for (auto j = i + 1; j < m_; ++j)
                 {
-                    if (!cmp::are_equal (tmp.rows_[j][i], 0.0, cmp::epsilon))
+                    if (!cmp::are_equal(tmp[j][i], 0.0, cmp::epsilon))
                     {
                         pivot_i = j;
                         break;
                     }
                 }
-                if (cmp::are_equal(tmp.rows_[pivot_i][i], 0.0, cmp::epsilon))
-                    return 0.0;
+                if (cmp::are_equal(tmp[pivot_i][i], 0.0, cmp::epsilon))
+                    return T(0);
 
-                std::swap (tmp.rows_[i], tmp.rows_[pivot_i]);
+                tmp.container_.swap_subarray (i * n_, (i + 1) * n_, pivot_i * n_);
 
                 sign *= (-1);
             }
 
-
             for (auto j = i + 1; j < m_; ++j)
             {
-                T koef = tmp.rows_[j][i] / tmp.rows_[i][i];
-                std::transform (tmp.rows_[j] + i, tmp.rows_[j] + n_, tmp.rows_[i] + i, tmp.rows_[j] + i,
+                T koef = tmp[j][i] / tmp[i][i];
+                std::transform (tmp.begin_data() + j * n_ + i, tmp.begin_data() + j * n_ + n_,
+                                tmp.begin_data() + i * n_ + i, tmp.begin_data() + j * n_ + i,
                                 [koef] (T first, T second) { return first -= koef * second; });
             }
         }
 
-        det = tmp.rows_[0][0];
+        T det = tmp[0][0];
         for (auto i = 1; i < n_; ++i)
-            det *= tmp.rows_[i][i];
+            det *= tmp[i][i];
 
         return det * sign;
     }
@@ -391,7 +312,7 @@ Matrix<T> Matrix<T>::eye (size_t n)
 {
     Matrix<T> identity (n, n, T(0));
     for (auto i = 0; i < n; ++i)
-        identity.rows_[i][i] = T(1);
+        identity[i][i] = T(1);
 
     return identity;
 }
