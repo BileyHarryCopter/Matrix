@@ -16,7 +16,6 @@ template <typename T> struct Buffer
 protected:
     T* buff_ = nullptr;
     size_t capty_ = 0;
-    size_t size_ = 0;
 
     Buffer (const size_t& capty = 0) :  buff_{(capty == 0) ? nullptr : 
                                                              static_cast<T *>(::operator new (sizeof(T) * capty))},
@@ -25,29 +24,23 @@ protected:
     Buffer& operator= (const Buffer &rhs) = delete;
 
     Buffer (Buffer&& rhs) noexcept : buff_{std::exchange(rhs.buff_, nullptr)},
-                                     size_{std::exchange(rhs.size_, 0)},
                                      capty_{std::exchange(rhs.capty_, 0)} {}
 
     Buffer& operator= (Buffer&& rhs) noexcept
     {
         std::swap (buff_, rhs.buff_);
-        std::swap (size_, rhs.size_);
         std::swap (capty_, rhs.capty_);
         return *this;
     }
 
-    ~Buffer ()
-    {
-        std::destroy(buff_, buff_ + size_);
-        ::operator delete (buff_);
-    }
+    ~Buffer () {::operator delete (buff_);}
 };
 
 template <typename T> class Array : private Buffer<T>
 {
     using Buffer<T>::buff_;
-    using Buffer<T>::size_;
     using Buffer<T>::capty_;
+    size_t size_ = 0;
 
 public:
 
@@ -60,6 +53,8 @@ public:
         for (; size_ < rhs.size_; ++size_)
             std::construct_at (buff_ + size_, T(rhs.buff_[size_]));
     }
+
+    ~Array() { std::destroy(buff_, buff_ + size_); }
 
     Array& operator= (const Array& rhs)
     {
