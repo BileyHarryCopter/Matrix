@@ -63,7 +63,7 @@ template<typename T = double> class Matrix
 
     //  Constructor of matrix (n x m) from sequence
     template<std::input_iterator It> 
-    Matrix (size_t n, size_t m, const It start, const It end) : n_{n}, m_{m}, container_{Array<T>(n_ * m_, start, end)} {}
+    Matrix (size_t n, size_t m, It start, It end) : n_{n}, m_{m}, container_{Array<T>(n_ * m_, start, end)} {}
 
     //  Constructor from nested initializer list
     Matrix (const std::initializer_list<std::initializer_list<T>>& input_list) : m_{input_list.size()}
