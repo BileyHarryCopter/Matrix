@@ -42,6 +42,12 @@ struct Border_Except : public Print_Except
     Border_Except() : Print_Except{"Borders of the subarray are should be within the basic array"} {}
 };
 
+struct Iterator_Except : public Print_Except
+{
+    Iterator_Except() : Print_Except{"For using constructor the 2nd it should be reachable from \
+                                      the 1st it by incrementing the 1st"} {}
+};
+
 //  Base class Buffer  //
 
 template <typename T>
@@ -101,7 +107,15 @@ public:
     }
 
     template<std::input_iterator It>
-    Array (size_t capty, const It start, const It end) : Buffer<T>(capty) {size_ = end - start; std::copy(start, end, buff_);}
+    Array (size_t capty, It start, It end): Buffer<T>(capty)
+    {
+        auto dist = std::distance(start, end);
+        if (dist < 0)
+            throw Iterator_Except{};
+
+        size_ = dist;
+        std::copy (start, end, buff_);
+    }
 
     T& operator[] (int n) 
     {
