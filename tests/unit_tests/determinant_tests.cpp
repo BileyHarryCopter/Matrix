@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../Matrix_Lib/include/matrix.hpp"
-#include "../Matrix_Lib/include/comparison.hpp"
+#include "../../include/matrix.hpp"
+#include "../../include/comparison.hpp"
 
 using namespace cmp;
 using namespace Matrix_Algebra;
@@ -20,11 +20,20 @@ TEST (DETERMINANT_TESTS, ZERO_DET)
     EXPECT_TRUE(are_equal(A.determinant(), 0.0, epsilon));
 }
 
-TEST (DETERMINANT_TESTS, CALL_FOR_INTEGER)
+TEST (DETERMINANT_TESTS, CALL_FOR_INTEGRAL)
 {
     Matrix<int> A = {{0, 1}, 
                      {1, 0}};
     EXPECT_TRUE(A.determinant() == -1);
+}
+
+TEST (DETERMINANT_TESTS, RANDOM_MATRIX)
+{
+    Matrix<int> A = Matrix<int>::random (10, 4);
+    Matrix<float> B = Matrix<float>::random(15, 11.2);
+
+    EXPECT_TRUE (A.determinant() == 4);
+    EXPECT_TRUE(are_equal(B.determinant(), 11.2, epsilon_for_det));
 }
 
 int main (int argc, char** argv)

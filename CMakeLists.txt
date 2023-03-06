@@ -8,4 +8,4 @@ set (CMAKE_CXX_STANDARD_REQUIRED True)
 enable_testing()
 
 add_subdirectory(tests)
-include_directories(Matrix Matrix_Lib/include)
+include_directories(Matrix include)

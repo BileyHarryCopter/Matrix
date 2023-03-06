@@ -1,10 +1,12 @@
 #include <gtest/gtest.h>
 #include <vector>
-#include "../Matrix_Lib/include/matrix.hpp"
+#include "../../include/matrix.hpp"
 
 using namespace Matrix_Algebra;
 
-TEST (OPERATOR_TESTS, EQUALITY)
+//  TESTS FOR OPERATOR WITH MATRICES  //
+
+TEST (MATRIX_OPERATORS_TESTS, EQUALITY)
 {
     Matrix<double> A = {{1, 0}, {2, 3}, {3, 3}};
     std::vector<double> v = {1, 0, 2, 3, 3, 3};
@@ -13,7 +15,7 @@ TEST (OPERATOR_TESTS, EQUALITY)
     EXPECT_TRUE (A == B);
 }
 
-TEST (OPERATOR__TESTS, NON_EQUALITY)
+TEST (MATRIX_OPERATORS_TESTS, NON_EQUALITY)
 {
     Matrix<double> A = {{1, 1}, {2, 3}, {3, 3}};
     std::vector<double> v = {1, 0, 2, 3, 3, 3};
@@ -22,7 +24,7 @@ TEST (OPERATOR__TESTS, NON_EQUALITY)
     EXPECT_TRUE (A != B);
 }
 
-TEST (OPERATOR_TESTS, ADDITION)
+TEST (MATRIX_OPERATORS_TESTS, ADDITION)
 {
     Matrix<double> A = {{1, 0}, {2, 3}, {3, 3}};
     Matrix<double> B = {{2, 0.1}, {2, 3.3}, {-2.4, 0.0}};
@@ -30,10 +32,10 @@ TEST (OPERATOR_TESTS, ADDITION)
     Matrix<double> D = {{2, 0.1}, {2, 3.3}};
 
     EXPECT_TRUE ((A + B) == C);
-    EXPECT_THROW({ Matrix<double> E = A + D; }, std::logic_error);
+    EXPECT_THROW({ Matrix<double> E = A + D; }, Addition_Except);
 }
 
-TEST (OPERATOR_TESTS, MULTIPLY_ON_NUMB)
+TEST (MATRIX_OPERATORS_TESTS, MULTIPLY_ON_NUMB)
 {
     Matrix<double> A = {{1, 0}, {2, 3}, {3, 3}};
     Matrix<double> B = {{2, 0}, {4, 6}, {6, 6}};
@@ -42,15 +44,16 @@ TEST (OPERATOR_TESTS, MULTIPLY_ON_NUMB)
     EXPECT_TRUE(B == A * 2.0);
 }
 
-TEST (OPERATOR_TEST, DIVISION_ON_NUMB)
+TEST (MATRIX_OPERATORS_TESTS, DIVISION_ON_NUMB)
 {
     Matrix<double> A = {{1, 0}, {2, 3}, {3, 3}};
     Matrix<double> B = {{2, 0}, {4, 6}, {6, 6}};
 
     EXPECT_TRUE(B == A / 0.5);
+    EXPECT_THROW({ B / 0.0; }, Division_Overflow_Except);
 }
 
-TEST (OPERATOR_TEST, CTOR_EYE)
+TEST (MATRIX_OPERATORS_TESTS, CTOR_EYE)
 {
     Matrix<double> A = {{1.0, 0.0, 0.0, 0.0},
                         {0.0, 1.0, 0.0, 0.0},
@@ -61,7 +64,7 @@ TEST (OPERATOR_TEST, CTOR_EYE)
     EXPECT_TRUE(B == A);
 }
 
-TEST (OPERATOR__TESTS, MATRIX_PRODUCT)
+TEST (MATRIX_OPERATORS_TESTS, MATRIX_PRODUCT)
 {
     Matrix<double> A = {{1.0, 0.0, 0.0},
                         {0.0, 1.0, 0.0},
@@ -77,7 +80,7 @@ TEST (OPERATOR__TESTS, MATRIX_PRODUCT)
     Matrix<double> D = Matrix<double>::eye(2);
 
     EXPECT_TRUE(C == matrix_product(A, B));
-    EXPECT_THROW({ C == matrix_product(A, D); }, std::logic_error);
+    EXPECT_THROW({ C == matrix_product(A, D); }, Product_Except);
 }
 
 int main(int argc, char** argv)
