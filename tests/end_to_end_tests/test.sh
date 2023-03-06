@@ -9,6 +9,7 @@ default="\033[0m"
 test_dir="tests/end_to_end_tests/"
 execution="./random_matrix"
 result_dir="random_matrices/"
+src_name="src/"
 
 # aux variable
 space=" "
@@ -29,6 +30,7 @@ if [ $# -le 2 ]
 then 
     echo "Perfomance testing requires more than 3 arguments"
 else
+    dump_state=0
     if [ $2 -le 0 ]
     then
         echo "Number of tests should be more 0"
@@ -36,6 +38,12 @@ else
         number_test=$1
         matrix_size=$2
         det_val=$3
+        dump_state=0
+
+        if [ $# -eq 4 ]
+        then 
+            dump_state=$4
+        fi
 
         Mkdir "${result_dir}"
 
@@ -54,7 +62,7 @@ else
         cd ${test_dir}
         for ((i = 0; i < $number_test; i++))
         do
-            ${execution}${space}${matrix_size}${space}${det_val} > ../../../${test_dir}${result_dir}result_${i}
+            ${execution}${space}${matrix_size}${space}${det_val}${space}${dump_state} > ../../../${test_dir}${result_dir}result_${i}
             read p < ../../../${test_dir}${result_dir}result_${i}
             if [ $p -eq $det_val ]
                 then
