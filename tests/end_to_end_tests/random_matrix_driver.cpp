@@ -6,25 +6,32 @@ using namespace Matrix_Algebra;
 
 int main (int argv, char** argc)
 {
-    std::string type = std::string{argc[1]};
-
-    std::string size_s = std::string{argc[2]};
-    size_t size = std::stoll(size_s, &size, 10);
-
-    if (type == "integral")
+    size_t size = 0;
+    int det = 0;
+    try
     {
-        std::string det_s = std::string{argc[3]};
-        int det = std::stoi (size_s, nullptr, 10);
-
-        Matrix<int> tmp = Matrix<int>::random(size, det);
-
-        std::cout << tmp.determinant() << std::endl << std::endl;
-        std::cout << tmp;
-
-        return det;
+        std::string size_s {argc[1]};
+        std::string det_s {argc[2]};
+        size = std::stoll (size_s, &size, 10);
+        det = std::stoi (det_s, nullptr, 10);
     }
-    else
-        throw std::runtime_error ("Type of matrix is undefined");
+    catch (std::logic_error)
+    {
+        std::cout << "Please, enter 2 arguments: size det\n";
+        return 0;
+    }
+
+    Matrix<int> tmp = Matrix<int>::random(size, det);
+
+    std::cout << tmp.determinant() << std::endl << std::endl;
+
+    if (argv == 4)
+    {
+        std::string is_dump_s {argc[3]};
+        int is_dump = std::stoi (is_dump_s, nullptr, 10);
+        if (is_dump == 1)
+            std::cout << tmp;
+    }
 
     return 0;
 }
