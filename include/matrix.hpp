@@ -210,7 +210,16 @@ template<typename T = double> class Matrix
         Matrix<T> tmp = *this;
         auto sign = 1;
 
-        for(int i = 0; i < n_ - 1; ++i) 
+        //  case if i == 0
+        for (int j = 1; j < m_; ++j)
+        {
+            auto pivot_i = tmp[0][0], pivot_j = tmp[j][0];
+            std::transform (tmp.begin_data() + n_ * j + 1, tmp.begin_data() + n_ * (j + 1),
+                            tmp.begin_data() + 1, tmp.begin_data() + n_ * j + 1,
+                            [pivot_i, pivot_j] (T first, T second) { return first = first * pivot_i - second * pivot_j;});
+        }
+
+        for(int i = 1; i < n_ - 1; ++i) 
         {
             //Pivot - row swap needed
             if(tmp[i][i] == 0) 
@@ -233,14 +242,20 @@ template<typename T = double> class Matrix
                 sign *= (-1);
             }
 
+            //  The under is more fast than previous version:
+            //  for (int k = i + 1; k < n_; ++k) 
+            //  {                    
+            //      tmp[j][k] = tmp[i][i] * tmp[j][k] - tmp[j][i] * tmp[i][k];
+            //      if (i != 0)
+            //          tmp[j][k] /= tmp[i-1][i-1];
+            //  }
+
             for (int j = i + 1; j < m_; ++j) 
             {
-                for (int k = i + 1; k < n_; ++k) 
-                {                    
-                    tmp[j][k] = tmp[i][i] * tmp[j][k] - tmp[j][i] * tmp[i][k];
-                    if (i != 0)
-                        tmp[j][k] /= tmp[i-1][i-1];
-                }
+                auto pivot_i = tmp[i][i], pivot_j = tmp[j][i];
+                std::transform(tmp.begin_data() + n_ * j + (i + 1), tmp.begin_data() + n_ * (j + 1),
+                               tmp.begin_data() + n_ * i + (i + 1), tmp.begin_data() + n_ * j + (i + 1),
+                               [pivot_i, pivot_j] (T first, T second) { return first = first * pivot_i - second * pivot_j; });
             }
         }
 
