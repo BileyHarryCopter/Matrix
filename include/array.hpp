@@ -156,7 +156,7 @@ public:
     
     void fill (size_t begin_i, size_t end_i, const T& elem)
     {
-        if (!((begin_i < size_) && (begin_i < end_i) && (end_i <= capty_)))
+        if (!((begin_i <= size_) && (begin_i < end_i) && (end_i <= capty_)))
             throw Range_Except{};
 
         std::destroy (buff_ + begin_i, buff_ + end_i);

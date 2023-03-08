@@ -4,6 +4,39 @@
 
 using namespace Matrix_Algebra;
 
+TEST (MATRIX_CONSTRUCTORS_TESTS, ITERATORS)
+{
+    std::vector<int> vA = {1, 0, 0, 0, 1, 0, 0, 0, 1};
+    Matrix<int> A = {3, 3, vA.begin(), vA.end()};
+
+    EXPECT_TRUE (A[0][0] == 1 && A[0][1] == 0 && A[0][2] == 0 &&
+                 A[1][0] == 0 && A[1][1] == 1 && A[1][2] == 0 &&
+                 A[2][0] == 0 && A[2][1] == 0 && A[2][2] == 1);
+
+    std::vector<float> vB = {1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0};
+    Matrix<float> B = {3, 3, vA.begin(), vA.end()};
+
+    EXPECT_TRUE (B[0][0] == 1.0 && B[0][1] == 0.0 && B[0][2] == 0.0 &&
+                 B[1][0] == 0.0 && B[1][1] == 1.0 && B[1][2] == 0.0 &&
+                 B[2][0] == 0.0 && B[2][1] == 0.0 && B[2][2] == 1.0);
+}
+
+TEST (MATRIX_CONSTRUCTORS_TESTS, INITIALIZER_LIST)
+{
+    Matrix<int> A = {{1, 0, 0},
+                     {0, 2, 0},
+                     {0, 0, 3}};
+    std::vector<int> vB = {1, 0, 0, 0, 2, 0, 0, 0, 3};
+    Matrix<int> B = {3, 3, vB.begin(), vB.end()};
+
+    EXPECT_TRUE (A == B);
+
+    Matrix<int> C = {{1},
+                     {0, 2},
+                     {0, 0, 3}};
+    EXPECT_TRUE (C == B);
+}
+
 //  TESTS FOR OPERATOR WITH MATRICES  //
 
 TEST (MATRIX_OPERATORS_TESTS, EQUALITY)
