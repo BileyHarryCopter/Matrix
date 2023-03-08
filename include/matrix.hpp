@@ -11,38 +11,36 @@
 #include "comparison.hpp"
 #include "array.hpp"
 
+//  Custom exception structs  //
+using namespace Custom_Exceptions;
+namespace Custom_Exceptions
+{
+    struct Addition_Except : public Print_Except {
+        Addition_Except() : Print_Except{"Size of the matrices should be equal for addition"} {}
+    };
+
+    struct Subtraction_Except : public Print_Except {
+        Subtraction_Except() : Print_Except{"Size of the matrices should be equal for subtraction"} {}
+    };
+
+    struct Division_Overflow_Except : public Print_Except {
+        Division_Overflow_Except() : Print_Except{"Division on zero is not allowed"} {}
+    };
+
+    struct Determinant_For_Non_Square_Except : public Print_Except {
+        Determinant_For_Non_Square_Except() : Print_Except{"The matrix should be square for calling determinant()"} {}
+    };
+
+    struct Product_Except : public Print_Except {
+        Product_Except() : Print_Except{"Number of rows of the 1st matrix should be equal \
+                                        number of coloumns of the 2nd matrix for using matrix multiplication"} {}
+    };
+}
+
 namespace Matrix_Algebra
 {
 
 using namespace My_Array;
-
-// Custom exception structs
-
-struct Addition_Except : public Print_Except
-{
-    Addition_Except() : Print_Except{"Size of the matrices should be equal for addition"} {}
-};
-
-struct Subtraction_Except : public Print_Except
-{
-    Subtraction_Except() : Print_Except{"Size of the matrices should be equal for subtraction"} {}
-};
-
-struct Division_Overflow_Except : public Print_Except
-{
-    Division_Overflow_Except() : Print_Except{"Division on zero is not allowed"} {}
-};
-
-struct Determinant_For_Non_Square_Except : public Print_Except
-{
-    Determinant_For_Non_Square_Except() : Print_Except{"The matrix should be square for calling determinant()"} {}
-};
-
-struct Product_Except : public Print_Except
-{
-    Product_Except() : Print_Except{"Number of rows of the 1st matrix should be equal \
-                                     number of coloumns of the 2nd matrix for using matrix multiplication"} {}
-};
 
 template<typename T = double> class Matrix
 {
@@ -144,7 +142,7 @@ template<typename T = double> class Matrix
     Matrix operator- ()
     {
         Matrix tmp = *this;
-        std::transform (container_.begin(), container_.begin() + m_ * n_, 
+        std::transform (container_.begin(),     container_.begin() + m_ * n_, 
                         tmp.container_.begin(), std::negate());
 
         return tmp;
@@ -162,7 +160,7 @@ template<typename T = double> class Matrix
         if (m_ != rhs.m_ || n_ != rhs.n_)
             throw Addition_Except{};
 
-        std::transform (container_.begin(), container_.begin() + m_ * n_, 
+        std::transform (container_.begin(),     container_.begin() + m_ * n_, 
                         rhs.container_.begin(), container_.begin(), std::plus());
 
         return *this;
@@ -210,25 +208,16 @@ template<typename T = double> class Matrix
         Matrix<T> tmp = *this;
         auto sign = 1;
 
-        //  case if i == 0
-        for (int j = 1; j < m_; ++j)
+        for(auto i = 0; i < n_ - 1; ++i) 
         {
-            auto pivot_i = tmp[0][0], pivot_j = tmp[j][0];
-            std::transform (tmp.begin_data() + n_ * j + 1, tmp.begin_data() + n_ * (j + 1),
-                            tmp.begin_data() + 1, tmp.begin_data() + n_ * j + 1,
-                            [pivot_i, pivot_j] (T first, T second) { return first = first * pivot_i - second * pivot_j;});
-        }
-
-        for(int i = 1; i < n_ - 1; ++i) 
-        {
-            //Pivot - row swap needed
+            //  Finding out a pivot element
             if(tmp[i][i] == 0) 
             {
                 auto pivot_i = i;
 
-                for (auto j = i + 1; j < n_; ++j)
+                for (auto j = i + 1; j < m_; ++j)
                 {
-                    if (tmp[j][i] > tmp[pivot_i][i])
+                    if (std::abs(tmp[j][i]) > std::abs(tmp[pivot_i][i]))
                     {
                         pivot_i = j;
                         break;
@@ -241,26 +230,40 @@ template<typename T = double> class Matrix
 
                 sign *= (-1);
             }
-
             //  The under is more fast than previous version:
-            //  for (int k = i + 1; k < n_; ++k) 
-            //  {                    
-            //      tmp[j][k] = tmp[i][i] * tmp[j][k] - tmp[j][i] * tmp[i][k];
-            //      if (i != 0)
-            //          tmp[j][k] /= tmp[i-1][i-1];
-            //  }
+            // for (auto j = i + 1; j < m_; ++j)
+            // {
+            //     for (int k = i + 1; k < n_; ++k)
+            //     {
+            //         tmp[j][k] = tmp[i][i] * tmp[j][k] - tmp[j][i] * tmp[i][k];
+            //         if (i != 0)
+            //             tmp[j][k] /= tmp[i - 1][i - 1];
+            //     }
+            // }
 
-            for (int j = i + 1; j < m_; ++j) 
+            if (i == 0)
             {
-                auto pivot_i = tmp[i][i], pivot_j = tmp[j][i];
+                for (auto j = 1; j < m_; ++j)
+                {
+                    auto pivot_i = tmp[0][0], pivot_j = tmp[j][0];
+                    std::transform (tmp.begin_data() + n_ * j + 1, tmp.begin_data() + n_ * (j + 1),
+                                    tmp.begin_data() + 1, tmp.begin_data() + n_ * j + 1,
+                                    [pivot_i, pivot_j] (T first, T second) { return first = first * pivot_i - second * pivot_j;});
+                }
+                continue;
+            }
+
+            for (auto j = i + 1; j < m_; ++j) 
+            {
+                auto pivot_i = tmp[i][i], pivot_j = tmp[j][i], koef = tmp[i - 1][i - 1];
                 std::transform(tmp.begin_data() + n_ * j + (i + 1), tmp.begin_data() + n_ * (j + 1),
-                               tmp.begin_data() + n_ * i + (i + 1), tmp.begin_data() + n_ * j + (i + 1),
-                               [pivot_i, pivot_j] (T first, T second) { return first = first * pivot_i - second * pivot_j; });
+                                tmp.begin_data() + n_ * i + (i + 1), tmp.begin_data() + n_ * j + (i + 1),
+                                [pivot_i, pivot_j, koef] (T first, T second) { return first = (first * pivot_i - second * pivot_j) / koef; });
             }
         }
 
         T det = tmp[n_ - 1][n_ - 1];
-    
+
         return det * sign;
     }
 
@@ -274,7 +277,7 @@ template<typename T = double> class Matrix
 
         for (auto i = 0; i < n_ - 1; ++i)
         {
-            //  finding out a pivot element
+            //  Finding out a pivot element
             if (cmp::are_equal(tmp[i][i], 0.0, cmp::epsilon))
             {
                 auto pivot_i = i;
@@ -290,7 +293,7 @@ template<typename T = double> class Matrix
                 if (cmp::are_equal(tmp[pivot_i][i], 0.0, cmp::epsilon))
                     return T(0);
 
-                tmp.container_.swap_subarray (i * n_, (i + 1) * n_, pivot_i * n_);
+                tmp.container_.swap_subarray(i * n_, (i + 1) * n_, pivot_i * n_);
 
                 sign *= (-1);
             }
@@ -392,7 +395,7 @@ Matrix<T> Matrix<T>::random (size_t n, const T& det)
     return tmp;
 }
 
-//  not effective multiplication for common case
+//  not effective multiplication for general case
 template <typename T>
 Matrix<T> matrix_product (const Matrix<T> &lhs, const Matrix<T> &rhs)
 {
