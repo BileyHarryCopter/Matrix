@@ -31,13 +31,20 @@ or:
     ./real_matrix << test
 ```
 where test is can be your own file with test
+
 2) Secondly, you can launch the for the random matrix: 
 ```
     ./random_matrix [S] [D] [-dump]
 ```
 where **S** - matrix order; **D** - value of determinant; option **-dump** needs for calling **dump()** of the random matrix to output stream, it can be ommited and in this case there is no calling **dump()**
-3) You also can launch generating N tests for directory [tests/end_to_end_tests](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests) with bash script:
+
+3) You can launch generating N tests for directory [tests/end_to_end_tests](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests) with bash script:
 ```
     ./test.sh [N] [S] [D] [-dump]
 ```
 where **N** - number of tests and all of other parametrs are same above. But in this case **dump()** of the random matrices will be located in **tests/end_to_end_tests/random_matrices**
+
+4) And you can also launch some basic tests with corner cases from directory [tests/end_to_end_tests/corner_tests](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests/corner_tests):
+```
+    ./corner_test.sh
+```
