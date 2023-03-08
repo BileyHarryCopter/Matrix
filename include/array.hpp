@@ -192,7 +192,7 @@ public:
         if (size_ - first2 < last1 - first1)
             throw Border_Except{};
 
-        for (auto i = 0, length = last1 - first1; i < length; ++i)
+        for (int i = 0, length = last1 - first1; i < length; ++i)
             std::swap(buff_[first1 + i], buff_[first2 + i]);
     }
 
