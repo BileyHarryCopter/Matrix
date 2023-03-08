@@ -7,46 +7,43 @@
 #include <string>
 #include <functional>
 
+//  Custom exception structs  //
+namespace Custom_Exceptions
+{
+    struct Print_Except : public std::runtime_error {
+        Print_Except(const char *msg) : std::runtime_error(msg) {}
+    };
+
+    struct Access_Except : public Print_Except {
+        Access_Except() : Print_Except{"The array doesn't have n-th element"} {}
+    };
+
+    struct Range_Except : public Print_Except {
+        Range_Except() : Print_Except{"This range is not inside into the array"} {}
+    };
+
+    struct Top_Except : public Print_Except {
+        Top_Except() : Print_Except{"The array is empty for top()"} {}
+    };
+
+    struct Pop_Except : public Print_Except {
+        Pop_Except() : Print_Except{"The array is empty for pop_back()"} {}
+    };
+
+    struct Border_Except : public Print_Except {
+        Border_Except() : Print_Except{"Borders of the subarray are should be within the basic array"} {}
+    };
+
+    struct Iterator_Except : public Print_Except {
+        Iterator_Except() : Print_Except{"For using constructor the 2nd it should be reachable from \
+                                        the 1st it by incrementing the 1st"} {}
+    };
+}
+
 namespace My_Array
 {
 
-//  Custom exception structs  //
-
-struct Print_Except : public std::runtime_error
-{
-    Print_Except(const char *msg) : std::runtime_error(msg) {}
-};
-
-struct Access_Except : public Print_Except
-{
-    Access_Except() : Print_Except{"The array doesn't have n-th element"} {}
-};
-
-struct Range_Except : public Print_Except
-{
-    Range_Except() : Print_Except{"This range is not inside into the array"} {}
-};
-
-struct Top_Except : public Print_Except
-{
-    Top_Except() : Print_Except{"The array is empty for top()"} {}
-};
-
-struct Pop_Except : public Print_Except
-{
-    Pop_Except() : Print_Except{"The array is empty for pop_back()"} {}
-};
-
-struct Border_Except : public Print_Except
-{
-    Border_Except() : Print_Except{"Borders of the subarray are should be within the basic array"} {}
-};
-
-struct Iterator_Except : public Print_Except
-{
-    Iterator_Except() : Print_Except{"For using constructor the 2nd it should be reachable from \
-                                      the 1st it by incrementing the 1st"} {}
-};
+using namespace Custom_Exceptions;
 
 //  Base class Buffer  //
 
@@ -195,8 +192,8 @@ public:
         if (size_ - first2 < last1 - first1)
             throw Border_Except{};
 
-        for (auto i = first1; i < last1; ++i)
-            std::swap (buff_[i], buff_[first2 + i]);
+        for (auto i = 0, length = last1 - first1; i < length; ++i)
+            std::swap(buff_[first1 + i], buff_[first2 + i]);
     }
 
     void dump () 
