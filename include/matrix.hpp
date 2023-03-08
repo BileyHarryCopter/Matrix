@@ -92,7 +92,7 @@ template<typename T = double> class Matrix
             container_.push_back(x);
     }
 
-    Proxy_Row operator[](int m)             { return Proxy_Row {begin_data() + m * n_}; }
+    Proxy_Row       operator[](int m)       { return Proxy_Row {begin_data() + m * n_}; }
     const Proxy_Row operator[](int m) const { return Proxy_Row {begin_data() + m * n_}; }
 
     size_t get_rows() const { return m_; }
@@ -118,7 +118,7 @@ template<typename T = double> class Matrix
         }
     }
 
-    bool operator== (const Matrix& rhs) const
+    bool operator==(const Matrix& rhs) const
     {
         if (this == &rhs)
             return true;
@@ -139,7 +139,7 @@ template<typename T = double> class Matrix
     }
     bool operator!=(const Matrix &rhs) const { return !(*this == rhs); }
 
-    Matrix operator- ()
+    Matrix operator-()
     {
         Matrix tmp = *this;
         std::transform (container_.begin(),     container_.begin() + m_ * n_, 
@@ -147,7 +147,7 @@ template<typename T = double> class Matrix
 
         return tmp;
     }
-    Matrix& inverse_sign ()
+    Matrix& inverse_sign()
     {
         std::transform (container_.begin(), container_.begin() + m_ * n_, 
                         container_.begin(), std::negate());
@@ -155,7 +155,7 @@ template<typename T = double> class Matrix
         return *this;
     }
 
-    Matrix& operator+= (const Matrix& rhs)
+    Matrix& operator+=(const Matrix& rhs)
     {
         if (m_ != rhs.m_ || n_ != rhs.n_)
             throw Addition_Except{};
@@ -166,7 +166,7 @@ template<typename T = double> class Matrix
         return *this;
     }
 
-    Matrix& operator-= (const Matrix& rhs)
+    Matrix& operator-=(const Matrix& rhs)
     {
         if (m_ != rhs.m_ || n_ != rhs.n_)
             throw Subtraction_Except{};
@@ -185,7 +185,7 @@ template<typename T = double> class Matrix
         return *this;
     }
 
-    Matrix& operator/= (T value)
+    Matrix& operator/=(T value)
     {
         if ((std::is_integral<T>::value == true) && (value == 0) ||
             cmp::are_equal (value, 0.0, cmp::epsilon) == true)
@@ -197,8 +197,8 @@ template<typename T = double> class Matrix
         return *this;
     }
 
-    static Matrix eye (size_t n);
-    static Matrix random (size_t n, const T &det);
+    static Matrix eye   (size_t n);
+    static Matrix random(size_t n, const T &det);
 
     T determinant() requires std::is_integral<T>::value
     {
