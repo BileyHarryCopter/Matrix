@@ -113,8 +113,8 @@ template<typename T = double> class Matrix
         {
             os << '\t';
             for (auto j = 0; j < n_; ++j)
-                os << "|" << std::setw(5) << std::left << container_[i * n_ + j];
-            os << "|\n";
+                os << container_[i * n_ + j] << " ";
+            os << "\n";
         }
     }
 
@@ -206,7 +206,7 @@ template<typename T = double> class Matrix
             throw Determinant_For_Non_Square_Except{};
 
         Matrix<T> tmp = *this;
-        auto sign = 1;
+        T sign = T(1);
 
         for(auto i = 0; i < n_ - 1; ++i) 
         {
@@ -228,7 +228,7 @@ template<typename T = double> class Matrix
 
                 tmp.container_.swap_subarray (i * n_, (i + 1) * n_, pivot_i * n_);
 
-                sign *= (-1);
+                sign *= T(-1);
             }
             //  The under is more fast than previous version:
             // for (auto j = i + 1; j < m_; ++j)
@@ -262,7 +262,7 @@ template<typename T = double> class Matrix
             }
         }
 
-        T det = tmp[n_ - 1][n_ - 1];
+        auto det = tmp[n_ - 1][n_ - 1];
 
         return det * sign;
     }
@@ -273,7 +273,7 @@ template<typename T = double> class Matrix
             throw Determinant_For_Non_Square_Except{};
 
         Matrix <T> tmp = *this;
-        auto sign = 1;
+        T sign = T(1);
 
         for (auto i = 0; i < n_ - 1; ++i)
         {
@@ -295,12 +295,13 @@ template<typename T = double> class Matrix
 
                 tmp.container_.swap_subarray(i * n_, (i + 1) * n_, pivot_i * n_);
 
-                sign *= (-1);
+                sign *= T(-1);
             }
 
             for (auto j = i + 1; j < m_; ++j)
             {
-                T koef = tmp[j][i] / tmp[i][i];
+                auto koef = tmp[j][i] / tmp[i][i];
+
                 std::transform (tmp.begin_data() + j * n_ + i, tmp.begin_data() + j * n_ + n_,
                                 tmp.begin_data() + i * n_ + i, tmp.begin_data() + j * n_ + i,
                                 [koef] (T first, T second) { return first -= koef * second; });
