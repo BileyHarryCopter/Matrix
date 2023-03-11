@@ -41,6 +41,7 @@ namespace Matrix_Algebra
 {
 
 using namespace My_Array;
+constexpr int RANDOM_MATRIX_COEF = 100000;
 
 template<typename T = double> class Matrix
 {
@@ -374,7 +375,7 @@ Matrix<T> Matrix<T>::random (size_t n, const T& det)
 
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<> dist(1, 100);
+    std::uniform_int_distribution<> dist(1, RANDOM_MATRIX_COEF);
 
     for (auto i = 1; i < n; ++i)
     {
