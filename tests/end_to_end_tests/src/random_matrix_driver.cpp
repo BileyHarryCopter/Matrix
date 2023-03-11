@@ -21,8 +21,7 @@ int main (int argv, char** argc)
         return 0;
     }
 
-    Matrix<int> tmp = Matrix<int>::random(size, det);
-
+    Matrix<long long int> tmp = Matrix<long long int>::random(size, det);
     std::cout << tmp.determinant() << std::endl << std::endl;
 
     if (argv == 4)
