@@ -33,4 +33,17 @@ target_link_directories(determinant_tests
                         PRIVATE ../../include
 )
 
-add_test(determinant_gtests determinant_tests)
+add_test(comparison_gtests comparison_tests)
+
+add_executable(comparison_tests comparison_tests.cpp)
+
+target_link_libraries(comparison_tests
+    PRIVATE
+    GTest::GTest
+)
+
+target_link_directories(comparison_tests
+                        PRIVATE ../../include
+)
+
+add_test(comparison_gtests comparison_tests)
