@@ -41,7 +41,7 @@ namespace Matrix_Algebra
 {
 
 using namespace My_Array;
-constexpr int RANDOM_MATRIX_COEF = 100000;
+constexpr int RANDOM_MATRIX_COEF = 100;
 
 template<typename T = double> class Matrix
 {
@@ -114,7 +114,7 @@ template<typename T = double> class Matrix
         {
             os << '\t';
             for (auto j = 0; j < n_; ++j)
-                os << container_[i * n_ + j] << " ";
+                os << std::setw(12) << std::right << container_[i * n_ + j] << " ";
             os << "\n";
         }
     }
