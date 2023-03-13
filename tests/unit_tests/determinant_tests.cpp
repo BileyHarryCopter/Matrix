@@ -33,7 +33,7 @@ TEST (DETERMINANT_TESTS, RANDOM_MATRIX)
     Matrix<float> B = Matrix<float>::random(15, 11.2);
 
     EXPECT_TRUE (A.determinant() == 4);
-    EXPECT_TRUE(are_equal(B.determinant(), 11.2, epsilon_for_det));
+    EXPECT_TRUE(are_equal(B.determinant(), 11.2, epsilon));
 }
 
 int main (int argc, char** argv)
