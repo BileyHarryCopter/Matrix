@@ -1,3 +1,5 @@
 .vscode
 TODO
 build
+tests/end_to_end_tests/random_tests/tests
+tests/end_to_end_tests/random_tests/results
