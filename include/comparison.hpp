@@ -4,16 +4,16 @@
 namespace cmp
 {
 
-constexpr double epsilon = 1e-10;
-constexpr double epsilon_for_det = 1e-10;
+constexpr double epsilon = 10e-10;
+constexpr double big_number = 10e6;
 
 inline bool are_equal(const double a, const double b, const double accurancy = epsilon)
 {
     auto diff = std::abs(a - b);
-    auto max = std::max(std::abs(a), std::abs(b));
+    auto min = std::min(std::abs(a), std::abs(b));
 
-    if (max != 0.0) //  not a pure zero
-        diff = diff / max;
+    if (min > big_number)
+        diff = diff / min;
 
     return diff < accurancy;
 }
