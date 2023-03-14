@@ -92,7 +92,7 @@ def launch_tests(mode_matrix, dump_flag, number_tests):
         for i in range (0, number_tests):
             os.system(room_dir_from_testgen + build_dir + test_dir + real_test_exe + " < " + tests_dir + "test_" + str(i) + " > " + results_dir + "result_" + str(i))
             diff = take_answer(tests_dir + "test_" + str(i), gauss_mode) - take_answer(results_dir + "result_" + str(i), gauss_mode)
-            if diff < epsilon:
+            if abs(diff) < epsilon:
                 print("Test_" + str(i) + ": ", colored ('passed', 'green')) 
             else:
                 print("Test_" + str(i) + ": ", colored('failed', 'red'))
