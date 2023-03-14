@@ -114,7 +114,7 @@ template<typename T = double> class Matrix
         {
             os << '\t';
             for (auto j = 0; j < n_; ++j)
-                os << std::setw(12) << std::right << container_[i * n_ + j] << " ";
+                os << std::setw(12) << std::right << std::fixed << container_[i * n_ + j] << " ";
             os << "\n";
         }
     }
@@ -293,6 +293,8 @@ template<typename T = double> class Matrix
                 }
                 if (cmp::are_equal(tmp[pivot_i][i], 0.0, cmp::epsilon))
                     return T(0);
+
+                std::cout << "Pivot on " << i << " iteration = " << pivot_i << std::endl;
 
                 tmp.container_.swap_subarray(i * n_, (i + 1) * n_, pivot_i * n_);
 
