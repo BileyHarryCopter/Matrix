@@ -42,13 +42,13 @@ where test is can be your own file with test
 ```
 where **S** - matrix order; **D** - value of determinant; option **-dump** needs for calling **dump()** of the random matrix to output stream, it can be ommited and in this case there is no calling **dump()**
 
-1) You can launch generating N tests from directory [tests/end_to_end_tests/random_tests/](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests/random_tests) with python script:
+3) You can launch generating N tests from directory [tests/end_to_end_tests/random_tests/](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests/random_tests) with python script:
 ```
     ./testgen.py [N] [S] [M] [D]
 ```
 where **N** - number of tests and all of other parametrs are same above; and **M** - mode of testing which can be **gauss** (*floating_point*) and **bareiss** (*integral*). But in this case **dump()** of the random matrices will be located in **tests/end_to_end_tests/random_matrices**
 
-1) And you can also launch some basic tests with corner cases from directory [tests/end_to_end_tests/corner_tests](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests/corner_tests):
+4) And you can also launch some basic tests with corner cases from directory [tests/end_to_end_tests/corner_tests](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests/corner_tests):
 ```
     ./corner_test.sh
 ```
