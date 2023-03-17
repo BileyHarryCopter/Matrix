@@ -29,11 +29,11 @@ TEST (DETERMINANT_TESTS, CALL_FOR_INTEGRAL)
 
 TEST (DETERMINANT_TESTS, RANDOM_MATRIX)
 {
-    Matrix<int> A = Matrix<int>::random (10, 4);
-    Matrix<float> B = Matrix<float>::random(15, 11.2);
+    Matrix<long long int> A = Matrix<long long int>::random (10, 4);
+    Matrix<long double> B = Matrix<long double>::random(100, 11.200000);
 
     EXPECT_TRUE (A.determinant() == 4);
-    EXPECT_TRUE(are_equal(B.determinant(), 11.2, epsilon));
+    EXPECT_TRUE(are_equal(B.determinant(), 11.200000, epsilon));
 }
 
 int main (int argc, char** argv)
