@@ -65,7 +65,7 @@ TEST (MATRIX_OPERATORS_TESTS, ADDITION)
     Matrix<double> D = {{2, 0.1}, {2, 3.3}};
 
     EXPECT_TRUE ((A + B) == C);
-    EXPECT_THROW({ Matrix<double> E = A + D; }, Addition_Except);
+    EXPECT_THROW({ Matrix<double> E = A + D; }, Mismatched_Size_Except);
 }
 
 TEST (MATRIX_OPERATORS_TESTS, MULTIPLY_ON_NUMB)
