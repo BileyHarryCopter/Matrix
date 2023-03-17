@@ -299,8 +299,8 @@ template<typename T = double> class Matrix
             {
                 auto koef = tmp[j][i] / tmp[i][i];
 
-                std::transform (tmp.begin_data() + j * n_ + i, tmp.begin_data() + j * n_ + n_,
-                                tmp.begin_data() + i * n_ + i, tmp.begin_data() + j * n_ + i,
+                std::transform (tmp.get_address(j, i), tmp.get_address(j + 1, 0),
+                                tmp.get_address(i, i), tmp.get_address(j, i),
                                 [koef] (T first, T second) { return first -= koef * second; });
             }
         }
