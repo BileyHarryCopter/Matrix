@@ -94,7 +94,9 @@ template<typename T = double> class Matrix
 
     size_t get_rows() const { return m_; }
     size_t get_cols() const { return n_; }
-    T*  begin_data () const { return container_.begin(); }
+    T*   begin_data() const { return container_.begin(); }
+    //  Give pointer T* to (*this)[i][j]
+    T*  get_address(int i, int j) const { return container_.begin() + i * n_ + j; }
 
     T& trace() const 
     {
@@ -243,8 +245,7 @@ template<typename T = double> class Matrix
                 for (auto j = 1; j < m_; ++j)
                 {
                     auto pivot_i = tmp[0][0], pivot_j = tmp[j][0];
-                    std::transform (tmp.begin_data() + n_ * j + 1, tmp.begin_data() + n_ * (j + 1),
-                                    tmp.begin_data() + 1, tmp.begin_data() + n_ * j + 1,
+                    std::transform (tmp.get_address(j, 1), tmp.get_address (j + 1, 0), tmp.get_address (0, 1), tmp.get_address (j, 1),
                                     [pivot_i, pivot_j] (T first, T second) { return first = first * pivot_i - second * pivot_j; });
                 }
                 continue;
@@ -253,9 +254,8 @@ template<typename T = double> class Matrix
             for (auto j = i + 1; j < m_; ++j) 
             {
                 auto pivot_i = tmp[i][i], pivot_j = tmp[j][i], koef = tmp[i - 1][i - 1];
-                std::transform(tmp.begin_data() + n_ * j + (i + 1), tmp.begin_data() + n_ * (j + 1),
-                               tmp.begin_data() + n_ * i + (i + 1), tmp.begin_data() + n_ * j + (i + 1),
-                               [pivot_i, pivot_j, koef] (T first, T second) { return first = (first * pivot_i - second * pivot_j) / koef; });
+                std::transform (tmp.get_address(j, i + 1), tmp.get_address (j + 1, 0), tmp.get_address (i, i + 1), tmp.get_address (j, i + 1),
+                                [pivot_i, pivot_j, koef] (T first, T second) { return first = (first * pivot_i - second * pivot_j) / koef; });
             }
         }
 
