@@ -15,12 +15,8 @@
 using namespace Custom_Exceptions;
 namespace Custom_Exceptions
 {
-    struct Addition_Except : public Print_Except {
-        Addition_Except() : Print_Except{"Size of the matrices should be equal for addition"} {}
-    };
-
-    struct Subtraction_Except : public Print_Except {
-        Subtraction_Except() : Print_Except{"Size of the matrices should be equal for subtraction"} {}
+    struct Mismatched_Size_Except : public Print_Except {
+        Mismatched_Size_Except() : Print_Except{"Size of the matrices should be equal for addition or subtraction"} {}
     };
 
     struct Division_Overflow_Except : public Print_Except {
@@ -159,7 +155,7 @@ template<typename T = double> class Matrix
     Matrix& operator+=(const Matrix& rhs)
     {
         if (m_ != rhs.m_ || n_ != rhs.n_)
-            throw Addition_Except{};
+            throw Mismatched_Size_Except{};
 
         std::transform (container_.begin(),     container_.begin() + m_ * n_, 
                         rhs.container_.begin(), container_.begin(), std::plus());
@@ -170,7 +166,7 @@ template<typename T = double> class Matrix
     Matrix& operator-=(const Matrix& rhs)
     {
         if (m_ != rhs.m_ || n_ != rhs.n_)
-            throw Subtraction_Except{};
+            throw Mismatched_Size_Except{};
 
         std::transform (container_.begin(),     container_.begin() + m_ * n_, 
                         rhs.container_.begin(), container_.begin(), std::minus());
@@ -231,7 +227,7 @@ template<typename T = double> class Matrix
 
                 sign *= T(-1);
             }
-            //  The under is more fast than previous version:
+            //  The under is faster than previous version:
             // for (auto j = i + 1; j < m_; ++j)
             // {
             //     for (int k = i + 1; k < n_; ++k)
@@ -249,7 +245,7 @@ template<typename T = double> class Matrix
                     auto pivot_i = tmp[0][0], pivot_j = tmp[j][0];
                     std::transform (tmp.begin_data() + n_ * j + 1, tmp.begin_data() + n_ * (j + 1),
                                     tmp.begin_data() + 1, tmp.begin_data() + n_ * j + 1,
-                                    [pivot_i, pivot_j] (T first, T second) { return first = first * pivot_i - second * pivot_j;});
+                                    [pivot_i, pivot_j] (T first, T second) { return first = first * pivot_i - second * pivot_j; });
                 }
                 continue;
             }
@@ -258,8 +254,8 @@ template<typename T = double> class Matrix
             {
                 auto pivot_i = tmp[i][i], pivot_j = tmp[j][i], koef = tmp[i - 1][i - 1];
                 std::transform(tmp.begin_data() + n_ * j + (i + 1), tmp.begin_data() + n_ * (j + 1),
-                                tmp.begin_data() + n_ * i + (i + 1), tmp.begin_data() + n_ * j + (i + 1),
-                                [pivot_i, pivot_j, koef] (T first, T second) { return first = (first * pivot_i - second * pivot_j) / koef; });
+                               tmp.begin_data() + n_ * i + (i + 1), tmp.begin_data() + n_ * j + (i + 1),
+                               [pivot_i, pivot_j, koef] (T first, T second) { return first = (first * pivot_i - second * pivot_j) / koef; });
             }
         }
 
@@ -293,8 +289,6 @@ template<typename T = double> class Matrix
                 }
                 if (cmp::are_equal(tmp[pivot_i][i], 0.0, cmp::epsilon))
                     return T(0);
-
-                std::cout << "Pivot on " << i << " iteration = " << pivot_i << std::endl;
 
                 tmp.container_.swap_subarray(i * n_, (i + 1) * n_, pivot_i * n_);
 
