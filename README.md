@@ -10,7 +10,7 @@ CMake with version 3.14 (or higher)
 
 Python3 with version 3.10.6 (or higher)
 
-Installed library of [termcolor] (https://pypi.org/project/termcolor/)
+Installed library of [termcolor](https://pypi.org/project/termcolor/)
 
 ## How to install and build
 
@@ -28,11 +28,11 @@ Installed library of [termcolor] (https://pypi.org/project/termcolor/)
 ## How to launch tests
 1) First of all, **driver** for the task is located in [tests/end_to_end_tests/src/](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests/src). You can execute this and redirect input stream:
 ```
-    ./integral_matrix << test
+    ./integral_matrix < test
 ```
 or:
 ```
-    ./real_matrix << test
+    ./real_matrix < test
 ```
 where test is can be your own file with test
 
