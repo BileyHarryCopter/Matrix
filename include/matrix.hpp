@@ -7,6 +7,7 @@
 #include <type_traits>
 #include <functional>
 #include <random>
+#include <concepts>
 
 #include "comparison.hpp"
 #include "array.hpp"
@@ -37,7 +38,7 @@ namespace Matrix_Algebra
 
 constexpr int RANDOM_MATRIX_COEF = 100;
 
-template<typename T = double> class Matrix
+template<typename T = double> class Matrix final
 {
 
     size_t n_ = 0, m_ = 0;
@@ -201,7 +202,7 @@ template<typename T = double> class Matrix
     static Matrix eye   (size_t n);
     static Matrix random(size_t n, const T &det);
 
-    T determinant() requires std::is_integral<T>::value
+    T determinant() requires std::integral<T>
     {
         if (n_ != m_)
             throw Custom_Exceptions::Determinant_For_Non_Square_Except{};
@@ -268,7 +269,7 @@ template<typename T = double> class Matrix
         return det * sign;
     }
 
-    T determinant() requires std::is_floating_point<T>::value
+    T determinant() requires std::floating_point<T>
     {
         if (n_ != m_)
             throw Custom_Exceptions::Determinant_For_Non_Square_Except{};
