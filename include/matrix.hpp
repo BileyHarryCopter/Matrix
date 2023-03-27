@@ -4,9 +4,8 @@
 #include <iostream>
 #include <iterator>
 #include <iomanip>
-#include <type_traits>
-#include <functional>
 #include <random>
+#include <functional>
 #include <concepts>
 
 #include "comparison.hpp"

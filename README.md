@@ -22,7 +22,7 @@ Installed library of [termcolor](https://pypi.org/project/termcolor/)
 ```
 2) Create a directory **build** and build the project into this directory:
 ```
-    cmake -B build
+    cmake -B build -DCMAKE_CXX_COMPILER=g++ -DCMAKE_BUILD_TYPE=Release
     cmake --build build
 ```
 ## How to launch tests
