@@ -19,6 +19,6 @@ TEST (COMPARISON_TEST, BIG_NUMBER)
     auto third = 134000002;
     auto fourth = 134000001;
 
-    EXPECT_TRUE(are_equal(first, second, epsilon));
+    EXPECT_TRUE (are_equal(first, second, epsilon));
     EXPECT_FALSE(are_equal(third, fourth, epsilon));
 }

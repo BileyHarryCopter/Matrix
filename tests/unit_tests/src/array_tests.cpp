@@ -13,7 +13,11 @@ TEST(ARRAY_TESTS, ACCESS_TEST)
     EXPECT_EQ (arr.capacity(), 10);
     EXPECT_EQ (arr[2], 2.0);
 
-    EXPECT_NO_THROW ({ auto non = arr[3]; });
-    EXPECT_THROW    ({ auto non = arr[4]; }, Custom_Exceptions::Access_Except);
+    EXPECT_NO_THROW ({ auto non = arr[2]; });
+    EXPECT_THROW    ({ auto non = arr[3]; }, Custom_Exceptions::Access_Except);
     EXPECT_THROW    ({ auto non = arr[200];},Custom_Exceptions::Access_Except);
+
+    std::cout << v.capacity() << std::endl;
+    std::cout << v[4]         << std::endl;
+    std::cout << v.capacity() << std::endl;
 }

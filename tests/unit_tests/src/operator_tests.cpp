@@ -65,7 +65,7 @@ TEST (MATRIX_OPERATORS_TESTS, ADDITION)
     Matrix<double> D = {{2, 0.1}, {2, 3.3}};
 
     EXPECT_TRUE ((A + B) == C);
-    EXPECT_THROW({ Matrix<double> E = A + D; }, Mismatched_Size_Except);
+    EXPECT_THROW({ Matrix<double> E = A + D; }, Custom_Exceptions::Mismatched_Size_Except);
 }
 
 TEST (MATRIX_OPERATORS_TESTS, MULTIPLY_ON_NUMB)
@@ -83,7 +83,7 @@ TEST (MATRIX_OPERATORS_TESTS, DIVISION_ON_NUMB)
     Matrix<double> B = {{2, 0}, {4, 6}, {6, 6}};
 
     EXPECT_TRUE(B == A / 0.5);
-    EXPECT_THROW({ B / 0.0; }, Division_Overflow_Except);
+    EXPECT_THROW({ B / 0.0; }, Custom_Exceptions::Division_Overflow_Except);
 }
 
 TEST (MATRIX_OPERATORS_TESTS, CTOR_EYE)
@@ -113,5 +113,5 @@ TEST (MATRIX_OPERATORS_TESTS, MATRIX_PRODUCT)
     Matrix<double> D = Matrix<double>::eye(2);
 
     EXPECT_TRUE(C == matrix_product(A, B));
-    EXPECT_THROW({ C == matrix_product(A, D); }, Product_Except);
+    EXPECT_THROW({ C == matrix_product(A, D); }, Custom_Exceptions::Product_Except);
 }

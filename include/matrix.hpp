@@ -12,7 +12,6 @@
 #include "array.hpp"
 
 //  Custom exception structs  //
-using namespace Custom_Exceptions;
 namespace Custom_Exceptions
 {
     struct Mismatched_Size_Except : public Print_Except {
@@ -36,14 +35,13 @@ namespace Custom_Exceptions
 namespace Matrix_Algebra
 {
 
-using namespace My_Array;
 constexpr int RANDOM_MATRIX_COEF = 100;
 
 template<typename T = double> class Matrix
 {
 
     size_t n_ = 0, m_ = 0;
-    Array<T> container_;
+    My_Array::Array<T> container_;
 
     struct Proxy_Row 
     {
@@ -54,11 +52,14 @@ template<typename T = double> class Matrix
 
     public :
 
-    Matrix (size_t n, size_t m, T value = T{}) : n_{n}, m_{m}, container_{m_ * n_}  { container_.fill(value); }
+    Matrix (size_t n, size_t m, T value = T{}) : n_{n}, m_{m}, container_{m_ * n_}  
+    {
+        container_.fill(value);
+    }
 
     //  Constructor of matrix (n x m) from sequence
     template<std::input_iterator It> 
-    Matrix (size_t n, size_t m, It start, It end) : n_{n}, m_{m}, container_{Array<T>(n_ * m_, start, end)} {}
+    Matrix (size_t n, size_t m, It start, It end) : n_{n}, m_{m}, container_{My_Array::Array<T>(n_ * m_, start, end)} {}
 
     //  Constructor from nested initializer list
     Matrix (const std::initializer_list<std::initializer_list<T>>& input_list) : m_{input_list.size()}
@@ -67,7 +68,7 @@ template<typename T = double> class Matrix
                                     {return (first.size() <= second.size()) ? second.size() : first.size();}).size();
         auto input_list_ptr = input_list.begin();
 
-        container_ = Array<T>{m_ * n_};
+        container_ = My_Array::Array<T>{m_ * n_};
 
         for (auto i = 0, pivot_i = 0; i < m_; ++i)
         {
@@ -126,12 +127,13 @@ template<typename T = double> class Matrix
             return false;
 
         if ((std::is_integral<T>::value == true) &&
-            (!std::equal(container_.begin(), container_.begin() + m_ * n_, rhs.container_.begin())))
+            (!std::equal(container_.begin(), container_.end(), rhs.container_.begin())))
                 return false;
+
         else if ((std::is_integral<T>::value == false) &&
-                 (!std::equal(container_.begin(), container_.begin() + m_ * n_, rhs.container_.begin(),
-                            [](T first, T second)
-                            { return cmp::are_equal(first, second, cmp::epsilon); })))
+                 (!std::equal(container_.begin(), container_.end(), rhs.container_.begin(),
+                  [](T first, T second)
+                  { return cmp::are_equal(first, second, cmp::epsilon); })))
                 return false;
 
         return true;
@@ -141,14 +143,14 @@ template<typename T = double> class Matrix
     Matrix operator-()
     {
         Matrix tmp = *this;
-        std::transform (container_.begin(),     container_.begin() + m_ * n_, 
+        std::transform (container_.begin(),     container_.end(), 
                         tmp.container_.begin(), std::negate());
 
         return tmp;
     }
     Matrix& inverse_sign()
     {
-        std::transform (container_.begin(), container_.begin() + m_ * n_, 
+        std::transform (container_.begin(), container_.end(), 
                         container_.begin(), std::negate());
 
         return *this;
@@ -157,9 +159,9 @@ template<typename T = double> class Matrix
     Matrix& operator+=(const Matrix& rhs)
     {
         if (m_ != rhs.m_ || n_ != rhs.n_)
-            throw Mismatched_Size_Except{};
+            throw Custom_Exceptions::Mismatched_Size_Except{};
 
-        std::transform (container_.begin(),     container_.begin() + m_ * n_, 
+        std::transform (container_.begin(),     container_.end(), 
                         rhs.container_.begin(), container_.begin(), std::plus());
 
         return *this;
@@ -168,9 +170,9 @@ template<typename T = double> class Matrix
     Matrix& operator-=(const Matrix& rhs)
     {
         if (m_ != rhs.m_ || n_ != rhs.n_)
-            throw Mismatched_Size_Except{};
+            throw Custom_Exceptions::Mismatched_Size_Except{};
 
-        std::transform (container_.begin(),     container_.begin() + m_ * n_, 
+        std::transform (container_.begin(),     container_.end(), 
                         rhs.container_.begin(), container_.begin(), std::minus());
 
         return *this;
@@ -178,7 +180,7 @@ template<typename T = double> class Matrix
 
     Matrix & operator*=(T value)
     {
-        std::transform (container_.begin(), container_.begin() + m_ * n_, 
+        std::transform (container_.begin(), container_.end(), 
                         container_.begin(), [value](T arg) { return arg *= value; });
 
         return *this;
@@ -188,9 +190,9 @@ template<typename T = double> class Matrix
     {
         if ((std::is_integral<T>::value == true) && (value == 0) ||
             cmp::are_equal (value, 0.0, cmp::epsilon) == true)
-                throw Division_Overflow_Except{};
+                throw Custom_Exceptions::Division_Overflow_Except{};
 
-        std::transform (container_.begin(), container_.begin() + m_ * n_, 
+        std::transform (container_.begin(), container_.end(), 
                         container_.begin(), [value](T arg) { return arg /= value; });
 
         return *this;
@@ -202,14 +204,14 @@ template<typename T = double> class Matrix
     T determinant() requires std::is_integral<T>::value
     {
         if (n_ != m_)
-            throw Determinant_For_Non_Square_Except{};
+            throw Custom_Exceptions::Determinant_For_Non_Square_Except{};
 
         Matrix<T> tmp = *this;
         T sign = T(1);
 
         for(auto i = 0; i < n_ - 1; ++i) 
         {
-            //  Finding out a pivot element
+            //  Finding a pivot element
             if(tmp[i][i] == 0) 
             {
                 auto pivot_i = i;
@@ -229,7 +231,7 @@ template<typename T = double> class Matrix
 
                 sign *= T(-1);
             }
-            //  The under is faster than previous version:
+            // The under is faster than previous version:
             // for (auto j = i + 1; j < m_; ++j)
             // {
             //     for (int k = i + 1; k < n_; ++k)
@@ -245,6 +247,7 @@ template<typename T = double> class Matrix
                 for (auto j = 1; j < m_; ++j)
                 {
                     auto pivot_i = tmp[0][0], pivot_j = tmp[j][0];
+
                     std::transform (tmp.get_address(j, 1), tmp.get_address (j + 1, 0), tmp.get_address (0, 1), tmp.get_address (j, 1),
                                     [pivot_i, pivot_j] (T first, T second) { return first = first * pivot_i - second * pivot_j; });
                 }
@@ -254,6 +257,7 @@ template<typename T = double> class Matrix
             for (auto j = i + 1; j < m_; ++j) 
             {
                 auto pivot_i = tmp[i][i], pivot_j = tmp[j][i], koef = tmp[i - 1][i - 1];
+
                 std::transform (tmp.get_address(j, i + 1), tmp.get_address (j + 1, 0), tmp.get_address (i, i + 1), tmp.get_address (j, i + 1),
                                 [pivot_i, pivot_j, koef] (T first, T second) { return first = (first * pivot_i - second * pivot_j) / koef; });
             }
@@ -267,14 +271,14 @@ template<typename T = double> class Matrix
     T determinant() requires std::is_floating_point<T>::value
     {
         if (n_ != m_)
-            throw Determinant_For_Non_Square_Except{};
+            throw Custom_Exceptions::Determinant_For_Non_Square_Except{};
 
         Matrix <T> tmp = *this;
         T sign = T(1);
 
         for (auto i = 0; i < n_ - 1; ++i)
         {
-            //  Finding out a pivot element
+            //  Finding a pivot element
             if (cmp::are_equal(tmp[i][i], 0.0, cmp::epsilon))
             {
                 auto pivot_i = i;
@@ -343,6 +347,7 @@ template <typename T>
 Matrix<T> operator/ (const Matrix<T> &lhs, const T value)
 {
     Matrix<T> tmp{lhs};
+
     return tmp /= value;
 }
 
@@ -376,6 +381,7 @@ Matrix<T> Matrix<T>::random (size_t n, const T& det)
     for (auto i = 1; i < n; ++i)
     {
         auto koef = dist(gen);
+
         std::transform (tmp.container_.begin(), tmp.container_.begin() + n,
                         tmp.container_.begin() + n * i, tmp.container_.begin(), 
                         [koef](T first, T second) { return first += second * koef; });
@@ -384,6 +390,7 @@ Matrix<T> Matrix<T>::random (size_t n, const T& det)
     for (auto i = 1; i < n; ++i)
     {
         auto koef = dist(gen);
+
         std::transform (tmp.container_.begin() + n * i, tmp.container_.begin() + n * (i + 1),
                         tmp.container_.begin(), tmp.container_.begin() + n * i, 
                         [koef](T first, T second) { return first += second * koef; });
@@ -399,7 +406,7 @@ Matrix<T> matrix_product (const Matrix<T> &lhs, const Matrix<T> &rhs)
 {
     size_t seq_l = lhs.get_cols();
     if (seq_l != rhs.get_rows())
-        throw Product_Except{};
+        throw Custom_Exceptions::Product_Except{};
 
     size_t new_m_ = lhs.get_rows();
     size_t new_n_ = rhs.get_cols();

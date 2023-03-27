@@ -36,17 +36,14 @@ namespace Custom_Exceptions
 
     struct Iterator_Except : public Print_Except {
         Iterator_Except() : Print_Except{"For using constructor the 2nd it should be reachable from \
-                                        the 1st it by incrementing the 1st"} {}
+                                         the 1st it by incrementing the 1st"} {}
     };
 }
 
 namespace My_Array
 {
 
-using namespace Custom_Exceptions;
-
 //  Base class Buffer  //
-
 template <typename T>
 struct Buffer
 {
@@ -108,7 +105,7 @@ public:
     {
         auto dist = std::distance(start, end);
         if (dist < 0)
-            throw Iterator_Except{};
+            throw Custom_Exceptions::Iterator_Except{};
 
         size_ = dist;
         std::copy (start, end, buff_);
@@ -116,15 +113,15 @@ public:
 
     T& operator[] (int n) 
     {
-        if (n > size_)
-            throw Access_Except{};
+        if (n >= size_)
+            throw Custom_Exceptions::Access_Except{};
         return buff_[n];
     }
 
     const T& operator[] (int n) const
     {
-        if (n > size_)
-            throw Access_Except{};
+        if (n >= size_)
+            throw Custom_Exceptions::Access_Except{};
         return buff_[n];
     }
 
@@ -157,7 +154,7 @@ public:
     void fill (size_t begin_i, size_t end_i, const T& elem)
     {
         if (!((begin_i <= size_) && (begin_i < end_i) && (end_i <= capty_)))
-            throw Range_Except{};
+            throw Custom_Exceptions::Range_Except{};
 
         std::destroy (buff_ + begin_i, buff_ + end_i);
 
@@ -172,14 +169,14 @@ public:
     T& top () 
     {
         if (size_ < 1)
-            throw Top_Except{};
+            throw Custom_Exceptions::Top_Except{};
         return buff_[size_];
     }
 
     void pop_back ()
     {
         if (size_ < 1)
-            throw Pop_Except{};
+            throw Custom_Exceptions::Pop_Except{};
         std::destroy_at (buff_[--size_]);
     }
 
@@ -187,16 +184,16 @@ public:
     void swap_subarray (size_t first1, size_t last1, size_t first2)
     {
         if (!((first1 < last1) && (last1 <= size_)))
-            throw Border_Except{};
+            throw Custom_Exceptions::Border_Except{};
 
         if (size_ - first2 < last1 - first1)
-            throw Border_Except{};
+            throw Custom_Exceptions::Border_Except{};
 
         for (int i = 0, length = last1 - first1; i < length; ++i)
             std::swap(buff_[first1 + i], buff_[first2 + i]);
     }
 
-    void dump () 
+    void dump () const
     {
         std::cout << "| ";
         for (auto i = 0; i < size_; i++)
