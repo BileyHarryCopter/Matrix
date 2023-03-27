@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
-#include "../../include/matrix.hpp"
-#include "../../include/comparison.hpp"
+#include "matrix.hpp"
+#include "comparison.hpp"
 
 using namespace cmp;
 using namespace Matrix_Algebra;
@@ -34,10 +34,4 @@ TEST (DETERMINANT_TESTS, RANDOM_MATRIX)
 
     EXPECT_TRUE (A.determinant() == 4);
     EXPECT_TRUE(are_equal(B.determinant(), 11.200000, epsilon));
-}
-
-int main (int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

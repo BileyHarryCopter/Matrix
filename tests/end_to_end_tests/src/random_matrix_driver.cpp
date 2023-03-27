@@ -1,6 +1,6 @@
 #include <iostream>
 #include <string>
-#include "../../../include/matrix.hpp"
+#include "matrix.hpp"
 
 using namespace Matrix_Algebra;
 enum modes {INTEGRAL, REAL};

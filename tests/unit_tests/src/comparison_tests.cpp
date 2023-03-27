@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "../../include/comparison.hpp"
+#include "comparison.hpp"
 
 using namespace cmp;
 
@@ -21,10 +21,4 @@ TEST (COMPARISON_TEST, BIG_NUMBER)
 
     EXPECT_TRUE(are_equal(first, second, epsilon));
     EXPECT_FALSE(are_equal(third, fourth, epsilon));
-}
-
-int main (int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

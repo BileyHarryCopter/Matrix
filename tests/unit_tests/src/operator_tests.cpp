@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <vector>
-#include "../../include/matrix.hpp"
+#include "matrix.hpp"
 
 using namespace Matrix_Algebra;
 
@@ -114,10 +114,4 @@ TEST (MATRIX_OPERATORS_TESTS, MATRIX_PRODUCT)
 
     EXPECT_TRUE(C == matrix_product(A, B));
     EXPECT_THROW({ C == matrix_product(A, D); }, Product_Except);
-}
-
-int main(int argc, char** argv)
-{
-    ::testing::InitGoogleTest(&argc, argv);
-    return RUN_ALL_TESTS();
 }

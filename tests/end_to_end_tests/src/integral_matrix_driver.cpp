@@ -1,6 +1,6 @@
 #include <iostream>
 #include <iterator>
-#include "../../../include/matrix.hpp"
+#include "matrix.hpp"
 
 using namespace Matrix_Algebra;
 
