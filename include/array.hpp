@@ -205,7 +205,7 @@ public:
     }
 
     T* begin () const { return buff_; }
-    T* end   () const { return buff_ + size_ + 1;}
+    T* end   () const { return buff_ + size_;}
 
     size_t size     () { return size_;  }
     size_t capacity () { return capty_; }
