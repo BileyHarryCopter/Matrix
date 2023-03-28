@@ -40,7 +40,7 @@ constexpr int RANDOM_MATRIX_COEF = 100;
 template<typename T = double> class Matrix final
 {
 
-    size_t n_ = 0, m_ = 0;
+    size_t n_ = 0, m_ = 0;  
     My_Array::Array<T> container_;
 
     struct Proxy_Row 
@@ -126,17 +126,13 @@ template<typename T = double> class Matrix final
         if (m_ != rhs.m_ || n_ != rhs.n_)
             return false;
 
-        if ((std::is_integral<T>::value == true) &&
-            (!std::equal(container_.begin(), container_.end(), rhs.container_.begin())))
-                return false;
+        if constexpr (std::is_integral_v<T>)
+            return std::equal(container_.begin(), container_.end(), rhs.container_.begin());
 
-        else if ((std::is_integral<T>::value == false) &&
-                 (!std::equal(container_.begin(), container_.end(), rhs.container_.begin(),
-                  [](T first, T second)
-                  { return cmp::are_equal(first, second, cmp::epsilon); })))
-                return false;
-
-        return true;
+        if constexpr (std::is_floating_point_v<T>)
+            return std::equal(container_.begin(), container_.end(), rhs.container_.begin(),
+                              [](T first, T second) { return cmp::are_equal(first, second, cmp::epsilon); });
+        
     }
     bool operator!=(const Matrix &rhs) const { return !(*this == rhs); }
 
@@ -362,6 +358,7 @@ template <typename T>
 Matrix<T> Matrix<T>::eye (size_t n)
 {
     Matrix<T> identity (n, n, T(0));
+
     for (auto i = 0; i < n; ++i)
         identity[i][i] = T(1);
 
