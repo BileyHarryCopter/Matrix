@@ -35,8 +35,9 @@ namespace Custom_Exceptions
     };
 
     struct Iterator_Except : public Print_Except {
-        Iterator_Except() : Print_Except{"For using constructor the 2nd it should be reachable from \
-                                         the 1st it by incrementing the 1st"} {}
+        Iterator_Except() : Print_Except{"For using constructor the 2nd iterator should be reachable from \
+                                          the 1st by incrementing the 1st. Distance between 1st and 2nd iterators \
+                                          should be less than capacity"} {}
     };
 }
 
@@ -111,7 +112,7 @@ public:
     Array (size_t capty, It start, It end): Buffer<T>(capty)
     {
         auto dist = std::distance(start, end);
-        if (dist <= 0)
+        if (dist <= 0 || capty < dist)
             throw Custom_Exceptions::Iterator_Except{};
 
         for (; size_ < dist; ++size_)
