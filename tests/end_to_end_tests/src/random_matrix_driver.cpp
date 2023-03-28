@@ -5,6 +5,11 @@
 using namespace Matrix_Algebra;
 enum modes {INTEGRAL, REAL};
 
+// 1st arg - size of random matrix
+// 2nd arg - mode: integral of real
+// 3rd arg - determinant's value
+// 4th arg - optional -dump for output the matrix
+
 int main (int argv, char** argc)
 {
     size_t size = 0;
