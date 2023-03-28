@@ -100,14 +100,10 @@ TEST(ARRAY_TEST, SWAP_SUBARRAY)
     Array<double> arr {5, v.begin(), v.end()};
 
     arr.swap_subarray(0, 2, 1);
-    arr.dump();
-    std::cout << std::endl;
     EXPECT_TRUE(arr.size() == 5 && arr.capacity() == 5 &&
                 arr[0] == 2.0 && arr[1] == 3.0 && arr[2] == 1.0 && arr[3] == 4.0 && arr[4] == 5.0);
 
     arr.swap_subarray(0, 1, 4);
-    arr.dump();
-    std::cout << std::endl;
     EXPECT_TRUE (arr.size() == 5 && arr.capacity() == 5 &&
                  arr[0] == 5.0 && arr[1] == 3.0 && arr[2] == 1.0 && arr[3] == 4.0 && arr[4] == 2.0);
 
