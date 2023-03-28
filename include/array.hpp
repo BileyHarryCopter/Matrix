@@ -50,7 +50,7 @@ struct Buffer
 
 protected:
     T* buff_ = nullptr;
-    size_t capty_ = 0;
+    size_t size_ = 0, capty_ = 0;
 
     Buffer (const size_t& capty = 0) :  buff_{(capty == 0) ? nullptr : 
                                                              static_cast<T *>(::operator new (sizeof(T) * capty))},
@@ -59,16 +59,23 @@ protected:
     Buffer& operator= (const Buffer &rhs) = delete;
 
     Buffer (Buffer&& rhs) noexcept : buff_{std::exchange(rhs.buff_, nullptr)},
-                                     capty_{std::exchange(rhs.capty_, 0)} {}
+                                     capty_{std::exchange(rhs.capty_, 0)},
+                                     size_ {std::exchange(rhs.size_, 0)} {}
 
     Buffer& operator= (Buffer&& rhs) noexcept
     {
         std::swap (buff_, rhs.buff_);
         std::swap (capty_, rhs.capty_);
+        std::swap (size_, rhs.size_);
+        
         return *this;
     }
 
-    ~Buffer () {::operator delete (buff_);}
+    ~Buffer () 
+    {
+        std::destroy(buff_, buff_ + size_);
+        ::operator delete(buff_);
+    }
 };
 
 //  Derived class Array
@@ -77,11 +84,12 @@ template <typename T> class Array : private Buffer<T>
 {
     using Buffer<T>::buff_;
     using Buffer<T>::capty_;
-    size_t size_ = 0;
+    using Buffer<T>::size_;
 
 public:
 
     Array (const size_t& capty = 0) : Buffer<T>(capty) {}
+
     Array (Array&& rhs) = default;
     Array& operator=(Array &&rhs) = default;
 
@@ -91,12 +99,11 @@ public:
             std::construct_at (buff_ + size_, T(rhs.buff_[size_]));
     }
 
-    ~Array() { std::destroy(buff_, buff_ + size_); }
-
     Array& operator= (const Array& rhs)
     {
         Array tmp(rhs);
         std::swap (*this, tmp);
+
         return *this;
     }
 
@@ -104,11 +111,11 @@ public:
     Array (size_t capty, It start, It end): Buffer<T>(capty)
     {
         auto dist = std::distance(start, end);
-        if (dist < 0)
+        if (dist <= 0)
             throw Custom_Exceptions::Iterator_Except{};
 
-        size_ = dist;
-        std::copy (start, end, buff_);
+        for (; size_ < dist; ++size_)
+            std::construct_at(buff_ + size_, static_cast<T>(*(start + size_)));
     }
 
     T& operator[] (int n) 
@@ -160,10 +167,10 @@ public:
 
         if (end_i < size_)
             for (auto i = begin_i; i < end_i; ++i)
-                std::construct_at(std::addressof(buff_[i]), elem);
+                std::construct_at(static_cast<T*>(&buff_[i]), elem);
         else
             for (; size_ < end_i; ++size_)
-                std::construct_at(std::addressof(buff_[size_]), elem);
+                std::construct_at(static_cast<T*>(&buff_[size_]), elem);
     }
 
     T& top () 
@@ -177,7 +184,7 @@ public:
     {
         if (size_ < 1)
             throw Custom_Exceptions::Pop_Except{};
-        std::destroy_at (buff_[--size_]);
+        std::destroy_at (static_cast<T*>(&buff_[--size_]));
     }
 
     //  Swap part as subarray
