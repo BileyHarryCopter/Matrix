@@ -11,18 +11,18 @@ int main (int argv, char** argc)
     {
         std::string order_s {};
         std::cin >> order_s;
-        auto order_i = std::stoi(order_s, nullptr, 10);
-        if (order < 0)
+        auto order_i = std::stof(order_s, nullptr);
+        if (order_i != static_cast<int>(order_i) || order_i <= 0)
         {
-            std::cout << "Input error: enter the order of unsigned integral type\n";
-            return 0;
+            std::cerr << "Input error: enter the order of unsigned integral type\n";
+            return -1;
         }
-        order = order_i;
+        order = static_cast<int>(order_i);
     }
-    catch (std::logic_error)
+    catch (const std::logic_error&)
     {
-        std::cout << "Input error: enter the order of unsigned integral type\n";
-        return 0;
+        std::cerr << "Input error: enter the order of unsigned integral type\n";
+        return -1;
     }
 
     std::vector<long long int> data_vec (order * order);
@@ -32,14 +32,20 @@ int main (int argv, char** argc)
         for (auto &x : data_vec)
         {
             std::cin >> x_s;
-            x = std::stoll(x_s, nullptr);
+            auto x_v = std::stold(x_s, nullptr);
+            if (x_v != static_cast<long long int>(x_v))
+            {
+                std::cerr << "Input error: enter the massive of integral numbers after the order of matrix\n";
+                return -1;
+            }
+            x = static_cast<long long int>(x_v);
             x_s.clear();
         }
     }
-    catch (std::logic_error)
+    catch (const std::logic_error&)
     {
-        std::cout << "Input error: enter the massive of floating point number after an order of matrix\n";
-        return 0;
+        std::cerr << "Input error: enter the massive of integral numbers after the order of matrix\n";
+        return -1;
     }
 
     Matrix<long long int> M {order, order, data_vec.cbegin(), data_vec.cend()};

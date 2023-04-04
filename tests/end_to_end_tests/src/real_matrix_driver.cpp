@@ -12,18 +12,18 @@ int main (int argv, char** argc)
     {
         std::string order_s {};
         std::cin >> order_s;
-        auto order_i = std::stoi(order_s, nullptr, 10);
-        if (order < 0)
+        auto order_i = std::stof(order_s, nullptr);
+        if (order_i != static_cast<int>(order_i) || order_i <= 0)
         {
-            std::cout << "Input error: enter the order of unsigned integral type\n";
-            return 0;
+            std::cerr << "Input error: enter the order of unsigned integral type\n";
+            return -1;
         }
-        order = order_i;
+        order = static_cast<int>(order_i);
     }
-    catch (std::logic_error)
+    catch (const std::logic_error&)
     {
-        std::cout << "Input error: enter the order of unsigned integral type\n";
-        return 0;
+        std::cerr << "Input error: enter the order of unsigned integral type\n";
+        return -1;
     }
 
     std::vector<long double> data_vec (order * order);
@@ -37,10 +37,10 @@ int main (int argv, char** argc)
             x_s.clear();
         }
     }
-    catch (std::logic_error)
+    catch (const std::logic_error&)
     {
-        std::cout << "Input error: enter the massive of floating point number after an order of matrix\n";
-        return 0;
+        std::cerr << "Input error: enter the massive of floating point numbers after an order of matrix\n";
+        return -1;
     }
 
     Matrix<long double> M {order, order, data_vec.cbegin(), data_vec.cend()};

@@ -50,10 +50,10 @@ int main (int argv, char** argc)
             std::cout << tmp.determinant();
         }
     }
-    catch (std::logic_error)
+    catch (const std::logic_error&)
     {
-        std::cout << "Please, enter 3 (or 4) arguments: size mode det (-dump opt.)\n";
-        return 0;
+        std::cerr << "Please, enter 3 (or 4) arguments: size mode det (-dump opt.)\n";
+        return -1;
     }
 
     return 0;
