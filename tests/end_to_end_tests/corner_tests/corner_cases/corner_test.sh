@@ -10,13 +10,10 @@ test_dir="tests/end_to_end_tests/"
 execution="./integral_matrix"
 result_dir="results/"
 tests_dir="tests/"
-corner_tests_dir="corner_tests/"
+corner_tests_dir="corner_tests/corner_cases/"
 
 # number of basic tests
 number_test=5
-
-# aux variable
-space=" "
 
 function Build
 {
@@ -33,7 +30,7 @@ function Mkdir
 Mkdir "${result_dir}"
 
 # moving to the room directory
-cd ../../../
+cd ../../../../
 
 echo "Building basic tests..."
 echo -ne "\n"
