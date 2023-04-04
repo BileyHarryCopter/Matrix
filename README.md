@@ -48,7 +48,12 @@ where **S** - matrix order; **D** - value of determinant; option **-dump** needs
 ```
 where **N** - number of tests and all of other parametrs are same above; and **M** - mode of testing which can be **gauss** (*floating_point*) and **bareiss** (*integral*). But in this case **dump()** of the random matrices will be located in **tests/end_to_end_tests/random_matrices**
 
-4) And you can also launch some basic tests with corner cases from directory [tests/end_to_end_tests/corner_tests](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests/corner_tests):
+4) You can also launch some basic tests with corner cases from directory [tests/end_to_end_tests/corner_tests/corner_cases/](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests/corner_tests/corner_cases):
 ```
     ./corner_test.sh
 ```
+5) And launch tests with bad input from directory [tests/end_to_end_tests/corner_tests/bad_input_tests/](https://github.com/BileyHarryCopter/Matrix/tree/main/tests/end_to_end_tests/corner_tests/bad_input_tests)
+```
+    ./bad_input_test.sh
+```
+
