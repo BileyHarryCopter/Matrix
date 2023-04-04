@@ -19,6 +19,9 @@ TEST (MATRIX_CONSTRUCTORS_TESTS, ITERATORS)
     EXPECT_TRUE (B[0][0] == 1.0 && B[0][1] == 0.0 && B[0][2] == 0.0 &&
                  B[1][0] == 0.0 && B[1][1] == 1.0 && B[1][2] == 0.0 &&
                  B[2][0] == 0.0 && B[2][1] == 0.0 && B[2][2] == 1.0);
+
+    Matrix<int> C = {{0, 1}, {1}};
+    EXPECT_EQ (C.determinant(), -1);
 }
 
 TEST (MATRIX_CONSTRUCTORS_TESTS, INITIALIZER_LIST)

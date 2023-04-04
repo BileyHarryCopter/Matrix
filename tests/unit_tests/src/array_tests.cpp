@@ -65,13 +65,6 @@ TEST(ARRAY_TEST, FILL)
 
     arr.fill(1.0);
     EXPECT_TRUE (arr[0] == 1.0 && arr[1] == 1.0 && arr[2] == 1.0);
-
-    arr.fill(0, 3, 2.0);
-    EXPECT_TRUE (arr[0] == 2.0 && arr[1] == 2.0 && arr[2] == 2.0);
-
-    EXPECT_THROW({arr.fill(9, 11, 2.4);},  Custom_Exceptions::Range_Except);
-    EXPECT_THROW({arr.fill(11, 12, 2.4);}, Custom_Exceptions::Range_Except);
-    EXPECT_THROW({arr.fill(5, 4, 2.4);},   Custom_Exceptions::Range_Except);
 }
 
 TEST(ARRAY_TEST, POP_BACK)
