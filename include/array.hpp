@@ -18,10 +18,6 @@ namespace Custom_Exceptions
         Access_Except() : Print_Except{"The array doesn't have n-th element"} {}
     };
 
-    struct Range_Except : public Print_Except {
-        Range_Except() : Print_Except{"This range is not inside into the array"} {}
-    };
-
     struct Top_Except : public Print_Except {
         Top_Except() : Print_Except{"The array is empty for top()"} {}
     };
@@ -161,21 +157,6 @@ public:
         clear();
         for (auto i = 0; i < capty_; ++i)
             push_back(elem);
-    }
-    
-    void fill (size_t begin_i, size_t end_i, const T& elem)
-    {
-        if (!((begin_i <= size_) && (begin_i < end_i) && (end_i <= capty_)))
-            throw Custom_Exceptions::Range_Except{};
-
-        std::destroy (buff_ + begin_i, buff_ + end_i);
-
-        if (end_i < size_)
-            for (auto i = begin_i; i < end_i; ++i)
-                std::construct_at(static_cast<T*>(&buff_[i]), elem);
-        else
-            for (; size_ < end_i; ++size_)
-                std::construct_at(static_cast<T*>(&buff_[size_]), elem);
     }
 
     T& top () 
