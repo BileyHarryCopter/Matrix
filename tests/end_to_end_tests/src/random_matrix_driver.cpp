@@ -53,7 +53,7 @@ int main (int argv, char** argc)
     catch (const std::logic_error&)
     {
         std::cerr << "Please, enter 3 (or 4) arguments: size mode det (-dump opt.)\n";
-        return -1;
+        return 1;
     }
 
     return 0;
