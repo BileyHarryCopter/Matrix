@@ -44,57 +44,61 @@ namespace Custom_Exceptions
 namespace My_Array
 {
 
-//  Base class Buffer  //
-template <typename T>
-struct Buffer
+namespace Detail
 {
 
-protected:
-    T* buff_ = nullptr;
-    size_t size_ = 0, capty_ = 0;
-
-    Buffer (const size_t& capty = 0) :  buff_{(capty == 0) ? nullptr : 
-                                                             static_cast<T *>(::operator new (sizeof(T) * capty))},
-                                        capty_{capty} {}
-    Buffer (const Buffer& rhs) = delete;
-    Buffer& operator= (const Buffer &rhs) = delete;
-
-    Buffer (Buffer&& rhs) noexcept : buff_{std::exchange(rhs.buff_, nullptr)},
-                                     capty_{std::exchange(rhs.capty_, 0)},
-                                     size_ {std::exchange(rhs.size_, 0)} {}
-
-    Buffer& operator= (Buffer&& rhs) noexcept
+    //  Base class Buffer  //
+    template <typename T>
+    struct Buffer
     {
-        std::swap (buff_, rhs.buff_);
-        std::swap (capty_, rhs.capty_);
-        std::swap (size_, rhs.size_);
-        
-        return *this;
-    }
 
-    ~Buffer () 
-    {
-        std::destroy(buff_, buff_ + size_);
-        ::operator delete(buff_);
-    }
-};
+    protected:
+        T* buff_ = nullptr;
+        size_t size_ = 0, capty_ = 0;
 
-//  Derived class Array
+        Buffer (const size_t& capty = 0) :  buff_{(capty == 0) ? nullptr : 
+                                                                static_cast<T *>(::operator new (sizeof(T) * capty))},
+                                            capty_{capty} {}
+        Buffer (const Buffer& rhs) = delete;
+        Buffer& operator= (const Buffer &rhs) = delete;
 
-template <typename T> class Array : private Buffer<T>
+        Buffer (Buffer&& rhs) noexcept : buff_{std::exchange(rhs.buff_, nullptr)},
+                                        capty_{std::exchange(rhs.capty_, 0)},
+                                        size_ {std::exchange(rhs.size_, 0)} {}
+
+        Buffer& operator= (Buffer&& rhs) noexcept
+        {
+            std::swap (buff_, rhs.buff_);
+            std::swap (capty_, rhs.capty_);
+            std::swap (size_, rhs.size_);
+            
+            return *this;
+        }
+
+        ~Buffer () 
+        {
+            std::destroy(buff_, buff_ + size_);
+            ::operator delete(buff_);
+        }
+    };
+
+}
+
+//  Derived class Array  //
+template <typename T> class Array final : private Detail::Buffer<T>
 {
-    using Buffer<T>::buff_;
-    using Buffer<T>::capty_;
-    using Buffer<T>::size_;
+    using Detail::Buffer<T>::buff_;
+    using Detail::Buffer<T>::capty_;
+    using Detail::Buffer<T>::size_;
 
 public:
 
-    Array (const size_t& capty = 0) : Buffer<T>(capty) {}
+    Array (const size_t& capty = 0) : Detail::Buffer<T>(capty) {}
 
     Array (Array&& rhs) = default;
     Array& operator=(Array &&rhs) = default;
 
-    Array (const Array& rhs) : Buffer<T>(rhs.capty_)
+    Array (const Array& rhs) : Detail::Buffer<T>(rhs.capty_)
     {
         for (; size_ < rhs.size_; ++size_)
             std::construct_at (buff_ + size_, T(rhs.buff_[size_]));
@@ -109,7 +113,7 @@ public:
     }
 
     template<std::input_iterator It>
-    Array (size_t capty, It start, It end): Buffer<T>(capty)
+    Array (size_t capty, It start, It end): Detail::Buffer<T>(capty)
     {
         auto dist = std::distance(start, end);
         if (dist <= 0 || capty < dist)
