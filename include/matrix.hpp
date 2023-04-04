@@ -65,7 +65,8 @@ template<typename T = double> class Matrix final
     Matrix (const std::initializer_list<std::initializer_list<T>>& input_list) : m_{input_list.size()}
     {
         n_ = std::max (input_list,  [](std::initializer_list<T> first, std::initializer_list<T> second) 
-                                    {return (first.size() <= second.size()) ? second.size() : first.size();}).size();
+                                    {return (first.size() <= second.size()) ? 1 : 0;}).size();
+
         auto input_list_ptr = input_list.begin();
 
         container_ = My_Array::Array<T>{m_ * n_};
@@ -77,7 +78,8 @@ template<typename T = double> class Matrix final
 
             auto input_list_i_len = input_list_ptr[i].size();
             if (input_list_i_len < n_)
-                container_.fill(pivot_i + input_list_i_len, pivot_i + n_, T(0));
+                for (auto i = input_list_i_len; i < n_; i++)
+                    container_.push_back(T(0));
 
             pivot_i += n_;
         }
