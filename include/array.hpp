@@ -112,7 +112,7 @@ public:
         return *this;
     }
 
-    template<std::input_iterator It>
+    template<std::random_access_iterator It>
     Array (size_t capty, It start, It end): Detail::Buffer<T>(capty)
     {
         auto dist = std::distance(start, end);

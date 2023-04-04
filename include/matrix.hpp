@@ -58,7 +58,7 @@ template<typename T = double> class Matrix final
     }
 
     //  Constructor of matrix (n x m) from sequence
-    template<std::input_iterator It> 
+    template<std::random_access_iterator It> 
     Matrix (size_t n, size_t m, It start, It end) : n_{n}, m_{m}, container_{My_Array::Array<T>(n_ * m_, start, end)} {}
 
     //  Constructor from nested initializer list
